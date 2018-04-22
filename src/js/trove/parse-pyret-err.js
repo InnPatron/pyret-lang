@@ -174,8 +174,8 @@
       }
     }
 
-    function parsePyret(data, fileName) {
-      RUNTIME.ffi.checkArity(2, arguments, "surface-parse", false);
+    function errParsePyret(data, fileName) {
+      RUNTIME.ffi.checkArity(2, arguments, "err-surface-parse", false);
       RUNTIME.checkString(data);
       RUNTIME.checkString(fileName);
       var result = parseDataRaw(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
@@ -192,16 +192,16 @@
       });
     }
 
-    function maybeParsePyret(data, fileName) {
-      RUNTIME.ffi.checkArity(2, arguments, "maybe-surface-parse", false);
+    function errMaybeParsePyret(data, fileName) {
+      RUNTIME.ffi.checkArity(2, arguments, "err-maybe-surface-parse", false);
       RUNTIME.checkString(data);
       RUNTIME.checkString(fileName);
       return parseDataRaw(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
     }
 
     return RUNTIME.makeModuleReturn({
-          'surface-parse': RUNTIME.makeFunction(parsePyret, "surface-parse"),
-          'maybe-surface-parse': RUNTIME.makeFunction(maybeParsePyret, "maybe-surface-parse"),
+          'err-surface-parse': RUNTIME.makeFunction(errParsePyrer, "err-surface-parse"),
+          'err-maybe-surface-parse': RUNTIME.makeFunction(errMaybeParsePyret, "err-maybe-surface-parse"),
         }, {});
   }
 })
