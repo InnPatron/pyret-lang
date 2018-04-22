@@ -2,6 +2,7 @@ provide *
 provide-types *
 
 import either as E
+import parse-pyret-err as EP
 import parse-pyret as P
 import ast as A
 import load-lib as L

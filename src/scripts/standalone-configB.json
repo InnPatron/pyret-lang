@@ -13,6 +13,9 @@
     "pyret-base/js/secure-loader": "build/phaseB/js/secure-loader.js",
     "pyret-base/js/post-load-hooks": "build/phaseB/js/post-load-hooks.js",
 
+    "pyret-base/js/err-parser": "build/phaseB/js/err-parser.js",
+    "pyret-base/js/err-tokenizer": "build/phaseB/js/err-tokenizer.js",
+
     "jglr/jglr": "lib/jglr/jglr.js",
     "jglr/rnglr": "lib/jglr/rnglr.js",
     "jglr/cyclicJSON": "lib/jglr/cyclicJSON.js"
