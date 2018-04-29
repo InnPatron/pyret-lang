@@ -1,3 +1,11 @@
 #lang ragg
 
-errr: ERRR
+/*
+  name: ErrGrammar
+*/
+
+program: prelude
+
+prelude: import-stmt
+
+import-stmt: IMPORT
