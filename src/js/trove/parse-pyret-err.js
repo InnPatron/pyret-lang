@@ -174,24 +174,6 @@
       }
     }
 
-    function errParsePyret(data, fileName) {
-      RUNTIME.ffi.checkArity(2, arguments, "err-surface-parse", false);
-      RUNTIME.checkString(data);
-      RUNTIME.checkString(fileName);
-      var result = parseDataRaw(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
-      return RUNTIME.ffi.cases(RUNTIME.ffi.isEither, "is-Either", result, {
-        left: function(err) {
-          var exn = RUNTIME.getField(err, "exn");
-          var message = RUNTIME.getField(err, "message");
-          console.error(message);
-          RUNTIME.raise(exn);
-        },
-        right: function(ast) {
-          return ast;
-        }
-      });
-    }
-
     function errMaybeParsePyret(data, fileName) {
       RUNTIME.ffi.checkArity(2, arguments, "err-maybe-surface-parse", false);
       RUNTIME.checkString(data);
@@ -200,7 +182,6 @@
     }
 
     return RUNTIME.makeModuleReturn({
-          'err-surface-parse': RUNTIME.makeFunction(errParsePyrer, "err-surface-parse"),
           'err-maybe-surface-parse': RUNTIME.makeFunction(errMaybeParsePyret, "err-maybe-surface-parse"),
         }, {});
   }
