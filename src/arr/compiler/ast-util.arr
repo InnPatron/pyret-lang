@@ -4,7 +4,7 @@ provide *
 provide-types *
 import srcloc as SL
 import ast as A
-import parse-pyret as PP
+import file("parser-interface.arr") as PP
 import file("compile-structs.arr") as CS
 import file("ast-anf.arr") as N
 import file("type-structs.arr") as T

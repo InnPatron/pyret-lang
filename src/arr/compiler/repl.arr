@@ -4,10 +4,10 @@ import ast as A
 import base as _
 import either as E
 import load-lib as L
-import parse-pyret as P
 import string-dict as SD
 import runtime-lib as R
 import sets as S
+import file("./parser-interface") as P
 import file("./ast-util.arr") as U
 import file("./resolve-scope.arr") as RN
 import file("./compile-structs.arr") as CS
