@@ -2,7 +2,6 @@ provide *
 provide-types *
 
 import either as E
-import parse-pyret as P
 import ast as A
 import load-lib as L
 import render-error-display as RED
@@ -11,6 +10,7 @@ import sets as S
 import sha as SHA
 import srcloc as Loc
 import string-dict as SD
+import file("parser-interface.arr") as P
 import file("compile-structs.arr") as CS
 import file("concat-lists.arr") as C
 import file("gensym.arr") as G

@@ -4,9 +4,9 @@ provide *
 provide-types *
 import ast as A
 import srcloc as S
-import parse-pyret as PP
 import string-dict as SD
 import lists as L
+import file("parser-interface.arr") as PP
 import file("compile-structs.arr") as C
 import file("ast-util.arr") as U
 import file("gensym.arr") as G
