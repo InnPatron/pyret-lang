@@ -86,6 +86,11 @@ define("pyret-base/js/balanced-tokenizer", ["jglr/jglr"], function(E) {
       return this.tokenizeBlockComment(match, str, 1, 2);
     }
     this.parenIsForExp = tok.parenIsForExp || "PARENNOSPACE";
+
+    if (tok_type === "IMPORT") {
+      return "__IGNORE";
+    }
+
     return tok_type;
   }
   Tokenizer.prototype.tokenizeBlockComment = function(match, str, nestingDepth, commentLen) {
