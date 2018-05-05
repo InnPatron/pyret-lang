@@ -42,6 +42,9 @@ define("pyret-base/js/balanced-tokenizer", ["jglr/jglr"], function(E) {
     GenTokenizer.prototype.tokenizeFrom.call(this, str);
     this.parenIsForExp = "PARENSPACE";
   }
+  Tokenizer.prototype.filter = function(tok_type) {
+    return tok_type == "FUN" || tok_type == "NAME";
+  }
   Tokenizer.prototype.makeToken = function (tok_type, s, pos) {
     switch(tok_type) {
     case "STRING": s = fixEscapes(s); break;
@@ -86,11 +89,6 @@ define("pyret-base/js/balanced-tokenizer", ["jglr/jglr"], function(E) {
       return this.tokenizeBlockComment(match, str, 1, 2);
     }
     this.parenIsForExp = tok.parenIsForExp || "PARENNOSPACE";
-
-    if (tok_type === "IMPORT") {
-      return "__IGNORE";
-    }
-
     return tok_type;
   }
   Tokenizer.prototype.tokenizeBlockComment = function(match, str, nestingDepth, commentLen) {
