@@ -4,4 +4,4 @@
   name: BalancedGrammar 
 */
 
-program: FUN name
+program: FUN NAME
