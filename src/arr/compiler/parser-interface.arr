@@ -11,7 +11,7 @@ type Either = E.Either
 fun surface-parse(content, uri):
   result = P.maybe-surface-parse(content, uri)
   cases(Either) result:
-    | left(err) => parser-err(content, uri, err)
+    | left(err) => raise(parser-err(content, uri, err))
     | right(code) => code
   end
 end
