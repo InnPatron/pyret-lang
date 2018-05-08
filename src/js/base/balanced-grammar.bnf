@@ -4,4 +4,19 @@
   name: BalancedGrammar 
 */
 
-program: FUN NAME
+program: prelude block
+
+prelude: [provide-stmt] [provide-types-stmt] import-stmt*
+
+provide-stmt: PROVIDE stmt END | PROVIDE 
+provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES
+
+import-stmt: INCLUDE import-source
+import-stmt: IMPORT import-source NAME
+import-stmt: IMPORT FROM import-source
+import-source: import-special | import-name
+import-special: NAME PARENNOSPACE RPAREN
+import-name: NAME
+
+
+record-ann: LBRACE RBRACE
