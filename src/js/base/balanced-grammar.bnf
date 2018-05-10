@@ -12,7 +12,7 @@ import-stmt: INCLUDE import-source
 import-stmt: IMPORT import-source NAME
 import-stmt: IMPORT comma-names FROM import-source
 import-source: import-special | import-name
-import-special: NAME PARENNOSPACE STRING (COMMA STRING)* RPAREN
+import-special: NAME PARENNOSPACE (COMMA)* RPAREN
 import-name: NAME
 provide-stmt: PROVIDE stmt END | PROVIDE STAR
 provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
@@ -56,10 +56,10 @@ fun-header: ty-params args return-ann
 ty-params: [(LANGLE|LT) comma-names (RANGLE|GT)]
 args: (PARENNOSPACE|PARENAFTERBRACE) [binding (COMMA binding)*] RPAREN
 return-ann: [THINARROW ann]
-doc-string: [DOC STRING]
+doc-string: [DOC]
 where-clause: [WHERE block]
 
-check-expr: (CHECK|EXAMPLES) STRING COLON block END
+check-expr: (CHECK|EXAMPLES) COLON block END
 check-expr: (CHECKCOLON|EXAMPLESCOLON) block END
 check-test: binop-expr check-op [PERCENT (PARENSPACE|PARENNOSPACE) binop-expr RPAREN] binop-expr
           | binop-expr check-op-postfix
@@ -128,13 +128,12 @@ paren-expr: (PARENSPACE|PARENAFTERBRACE) binop-expr RPAREN
 
 id-expr: NAME
 
-prim-expr: num-expr | frac-expr | rfrac-expr | bool-expr | string-expr
+prim-expr: num-expr | frac-expr | rfrac-expr | bool-expr
 
 num-expr: NUMBER
 frac-expr: RATIONAL
 rfrac-expr: ROUGHRATIONAL
 bool-expr: TRUE | FALSE
-string-expr: STRING
 
 lambda-expr: LAM fun-header (BLOCK|COLON) doc-string block where-clause END
 lambda-expr: LBRACE fun-header (BLOCK|COLON) doc-string block where-clause RBRACE
