@@ -94,7 +94,7 @@ check-op: IS | ISEQUALEQUAL | ISEQUALTILDE | ISSPACESHIP | ISROUGHLY
 
 check-op-postfix: RAISESNOT
 
-expr: paren-expr | id-expr | prim-expr
+expr: paren-expr | id-expr
     | lambda-expr | method-expr | app-expr
     | obj-expr | tuple-expr | tuple-get
     | dot-expr
@@ -127,13 +127,6 @@ bad-expr: UNTERMINATED-STRING | UNTERMINATED-BLOCK-COMMENT | BAD-OPER | BAD-NUMB
 paren-expr: (PARENSPACE|PARENAFTERBRACE) binop-expr RPAREN
 
 id-expr: NAME
-
-prim-expr: num-expr | frac-expr | rfrac-expr | bool-expr
-
-num-expr: NUMBER
-frac-expr: RATIONAL
-rfrac-expr: ROUGHRATIONAL
-bool-expr: TRUE | FALSE
 
 lambda-expr: LAM fun-header (BLOCK|COLON) doc-string block where-clause END
 lambda-expr: LBRACE fun-header (BLOCK|COLON) doc-string block where-clause RBRACE
