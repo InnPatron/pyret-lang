@@ -51,12 +51,11 @@ type-let-expr: TYPE-LET type-let-bind (COMMA type-let-bind)* (BLOCK|COLON) block
 
 contract-stmt: NAME COLONCOLON (ann | noparen-arrow-ann)
 
-fun-expr: FUN NAME fun-header (BLOCK|COLON) doc-string block where-clause END
+fun-expr: FUN NAME fun-header (BLOCK|COLON) block where-clause END
 fun-header: ty-params args return-ann
 ty-params: [(LANGLE|LT) comma-names (RANGLE|GT)]
 args: (PARENNOSPACE|PARENAFTERBRACE) [binding (COMMA binding)*] RPAREN
 return-ann: [THINARROW ann]
-doc-string: [DOC]
 where-clause: [WHERE block]
 
 check-expr: (CHECK|EXAMPLES) COLON block END
@@ -128,10 +127,10 @@ paren-expr: (PARENSPACE|PARENAFTERBRACE) binop-expr RPAREN
 
 id-expr: NAME
 
-lambda-expr: LAM fun-header (BLOCK|COLON) doc-string block where-clause END
-lambda-expr: LBRACE fun-header (BLOCK|COLON) doc-string block where-clause RBRACE
+lambda-expr: LAM fun-header (BLOCK|COLON) block where-clause END
+lambda-expr: LBRACE fun-header (BLOCK|COLON) block where-clause RBRACE
 
-method-expr: METHOD fun-header (BLOCK|COLON) doc-string block where-clause END
+method-expr: METHOD fun-header (BLOCK|COLON) block where-clause END
 
 app-expr: expr app-args
 # application must have the function expression immediately adjacent to
@@ -155,11 +154,11 @@ obj-expr: LBRACE obj-fields RBRACE | LBRACE RBRACE
 obj-fields: obj-field (COMMA obj-field)* [COMMA]
 obj-field: key COLON binop-expr
      | REF key [COLONCOLON ann] COLON binop-expr
-     | METHOD key fun-header (BLOCK|COLON) doc-string block where-clause END
+     | METHOD key fun-header (BLOCK|COLON) block where-clause END
 
 fields: field (COMMA field)* [COMMA]
 field: key COLON binop-expr
-     | METHOD key fun-header (BLOCK|COLON) doc-string block where-clause END
+     | METHOD key fun-header (BLOCK|COLON) block where-clause END
 key: NAME
 
 construct-expr: LBRACK construct-modifier binop-expr COLON trailing-opt-comma-binops RBRACK
