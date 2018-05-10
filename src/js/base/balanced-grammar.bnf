@@ -9,7 +9,7 @@ program: prelude block
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
 
 import-stmt: INCLUDE import-source
-import-stmt: IMPORT import-source AS NAME
+import-stmt: IMPORT import-source NAME
 import-stmt: IMPORT comma-names FROM import-source
 import-source: import-special | import-name
 import-special: NAME PARENNOSPACE STRING (COMMA STRING)* RPAREN
@@ -30,11 +30,11 @@ spy-contents: spy-field (COMMA spy-field)*
 spy-field: id-expr | NAME COLON binop-expr
 
 type-expr: TYPE NAME ty-params EQUALS ann
-newtype-expr: NEWTYPE NAME AS NAME
+newtype-expr: NEWTYPE NAME NAME
 let-expr: toplevel-binding EQUALS binop-expr
 binding: name-binding | tuple-binding
 
-tuple-binding: LBRACE (binding SEMI)* binding [SEMI] RBRACE [AS name-binding]
+tuple-binding: LBRACE (binding SEMI)* binding [SEMI] RBRACE [name-binding]
 name-binding: [SHADOW] NAME [COLONCOLON ann]
 
 toplevel-binding: binding
@@ -44,7 +44,7 @@ let-binding: let-expr | var-expr
 letrec-expr: LETREC let-expr (COMMA let-expr)* (BLOCK|COLON) block END
 
 type-bind: NAME ty-params EQUALS ann
-newtype-bind: NEWTYPE NAME AS NAME
+newtype-bind: NEWTYPE NAME NAME
 
 type-let-bind: type-bind | newtype-bind
 type-let-expr: TYPE-LET type-let-bind (COMMA type-let-bind)* (BLOCK|COLON) block END
