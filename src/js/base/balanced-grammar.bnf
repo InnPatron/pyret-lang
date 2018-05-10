@@ -80,10 +80,7 @@ assign-expr: NAME COLONEQUALS binop-expr
 
 when-expr: WHEN binop-expr (BLOCK|COLON) block END
 
-binop-expr: expr (binop expr)*
-
-binop: PLUS | DASH | STAR | SLASH | LEQ | GEQ | EQUALEQUAL | SPACESHIP | EQUALTILDE
-     | NEQ  | LT  | GT | AND | OR | CARET
+binop-expr: expr (expr)*
 
 check-op: IS | ISEQUALEQUAL | ISEQUALTILDE | ISSPACESHIP | ISROUGHLY
         | ISNOT | ISNOTEQUALEQUAL | ISNOTEQUALTILDE | ISNOTSPACESHIP
