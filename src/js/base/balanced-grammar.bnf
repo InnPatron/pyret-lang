@@ -9,13 +9,13 @@ program: prelude block
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
 
 import-stmt: INCLUDE import-source
-import-stmt: IMPORT import-source NAME
+import-stmt: IMPORT import-source
 import-stmt: IMPORT comma-names FROM import-source
-import-source: import-special | import-name
-import-special: NAME PARENNOSPACE (COMMA)* RPAREN
-import-name: NAME
+import-source: [import-special]
+import-special: PARENNOSPACE (COMMA)* RPAREN
 provide-stmt: PROVIDE stmt END | PROVIDE STAR
 provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
+
 comma-names: NAME (COMMA NAME)*
 
 block: stmt*
