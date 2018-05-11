@@ -60,7 +60,7 @@ where-clause: [WHERE block]
 
 check-expr: (CHECK|EXAMPLES) COLON block END
 check-expr: (CHECKCOLON|EXAMPLESCOLON) block END
-check-test: binop-expr check-op [PERCENT (PARENSPACE|PARENNOSPACE) binop-expr RPAREN] binop-expr
+check-test: binop-expr check-op [(PARENSPACE|PARENNOSPACE) binop-expr RPAREN] binop-expr
           | binop-expr check-op-postfix
           | binop-expr
 
@@ -239,6 +239,6 @@ app-ann: (name-ann|dot-ann) LANGLE comma-anns RANGLE
 
 comma-anns: ann (COMMA ann)*
 
-pred-ann: ann PERCENT (PARENSPACE|PARENNOSPACE) id-expr RPAREN
+pred-ann: ann (PARENSPACE|PARENNOSPACE) id-expr RPAREN
 
 dot-ann : NAME DOT NAME
