@@ -14,7 +14,7 @@ provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 
 block: stmt*
 
-stmt: type-expr | newtype-expr | spy-stmt
+stmt: type-expr | spy-stmt
     | let-expr | fun-expr | data-expr | when-expr
     | var-expr | rec-expr | assign-expr | check-test | check-expr
     | contract-stmt
@@ -24,7 +24,6 @@ spy-contents: spy-field (COMMA spy-field)*
 spy-field: COLON binop-expr
 
 type-expr: TYPE ty-params EQUALS ann
-newtype-expr: NEWTYPE NAME NAME
 let-expr: toplevel-binding EQUALS binop-expr
 binding: name-binding | tuple-binding
 
