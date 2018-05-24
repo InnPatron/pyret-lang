@@ -21,7 +21,7 @@ stmt: type-expr | newtype-expr | spy-stmt
 
 spy-stmt: SPY [binop-expr] COLON [spy-contents] END
 spy-contents: spy-field (COMMA spy-field)*
-spy-field: NAME COLON binop-expr
+spy-field: COLON binop-expr
 
 type-expr: TYPE NAME ty-params EQUALS ann
 newtype-expr: NEWTYPE NAME NAME
