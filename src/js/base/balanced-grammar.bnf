@@ -75,7 +75,7 @@ when-expr: WHEN binop-expr (BLOCK|COLON) block END
 
 binop-expr: expr (expr)*
 
-expr: paren-expr | id-expr
+expr: paren-expr
     | lambda-expr | method-expr | app-expr
     | obj-expr | tuple-expr | tuple-get
     | dot-expr
@@ -106,8 +106,6 @@ bad-expr: UNTERMINATED-STRING | UNTERMINATED-BLOCK-COMMENT | BAD-OPER | BAD-NUMB
 # paren-exprs must be preceded by a space, so as not be be confused with
 # function application
 paren-expr: (PARENSPACE|PARENAFTERBRACE) binop-expr RPAREN
-
-id-expr: NAME
 
 lambda-expr: LAM fun-header (BLOCK|COLON) block where-clause END
 lambda-expr: LBRACE fun-header (BLOCK|COLON) block where-clause RBRACE
