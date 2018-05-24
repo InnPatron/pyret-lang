@@ -23,7 +23,7 @@ spy-stmt: SPY [binop-expr] COLON [spy-contents] END
 spy-contents: spy-field (COMMA spy-field)*
 spy-field: COLON binop-expr
 
-type-expr: TYPE NAME ty-params EQUALS ann
+type-expr: TYPE ty-params EQUALS ann
 newtype-expr: NEWTYPE NAME NAME
 let-expr: toplevel-binding EQUALS binop-expr
 binding: name-binding | tuple-binding
