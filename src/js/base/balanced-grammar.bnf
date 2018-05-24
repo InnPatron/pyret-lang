@@ -217,10 +217,10 @@ noparen-arrow-ann: [arrow-ann-args] THINARROW ann
 arrow-ann-args: comma-anns | (PARENSPACE|PARENNOSPACE|PARENAFTERBRACE) comma-ann-field RPAREN
 arrow-ann: (PARENSPACE|PARENNOSPACE|PARENAFTERBRACE) [arrow-ann-args] THINARROW ann RPAREN
 
-app-ann: (name-ann|dot-ann) LANGLE comma-anns RANGLE
+app-ann: (dot-ann) LANGLE comma-anns RANGLE
 
 comma-anns: ann (COMMA ann)*
 
 pred-ann: ann (PARENSPACE|PARENNOSPACE) id-expr RPAREN
 
-dot-ann : NAME DOT NAME
+dot-ann : DOT
