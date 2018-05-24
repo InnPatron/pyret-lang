@@ -8,12 +8,8 @@ program: prelude block
 
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
 
-import-stmt: INCLUDE import-source
-import-stmt: IMPORT import-source
-import-stmt: IMPORT (COMMA)* FROM import-source
-import-source: [import-special]
-import-special: PARENNOSPACE (COMMA)* RPAREN
-provide-stmt: PROVIDE stmt END | PROVIDE STAR
+import-stmt: PARENNOSPACE (COMMA)* RPAREN
+provide-stmt: stmt
 provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 
 block: stmt*
