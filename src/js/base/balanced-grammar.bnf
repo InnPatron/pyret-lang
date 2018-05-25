@@ -10,7 +10,7 @@ prelude: [provide-stmt] [provide-types-stmt] import-stmt*
 
 import-stmt: PARENNOSPACE (COMMA)* RPAREN
 provide-stmt: stmt
-provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
+provide-types-stmt: record-ann
 
 block: stmt*
 
