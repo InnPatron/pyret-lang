@@ -237,6 +237,9 @@ test: pyret-test type-check-test
 parse-test: tests/parse/parse.js build/phaseA/js/pyret-tokenizer.js build/phaseA/js/pyret-parser.js
 	cd tests/parse/ && $(NODE) test.js require-test-runner/
 
+balanced-test: tests/balanced/balanced.js build/phaseA/js/pyret-tokenizer.js build/phaseA/js/pyret-parser.js
+	cd tests/balanced/ && $(NODE) test.js require-test-runner/
+
 TEST_FILES := $(wildcard tests/pyret/tests/*.arr)
 TYPE_TEST_FILES := $(wildcard tests/type-check/bad/*.arr) $(wildcard tests/type-check/good/*.arr) $(wildcard tests/type-check/should/*.arr) $(wildcard tests/type-check/should-not/*.arr)
 REG_TEST_FILES := $(wildcard tests/pyret/regression/*.arr)
