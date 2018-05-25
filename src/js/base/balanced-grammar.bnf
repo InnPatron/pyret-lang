@@ -28,7 +28,7 @@ let-expr: toplevel-binding EQUALS binop-expr
 binding: name-binding | tuple-binding
 
 tuple-binding: LBRACE (binding SEMI)* binding [SEMI] RBRACE [name-binding]
-name-binding: NAME [COLONCOLON ann]
+name-binding: [COLONCOLON ann]
 
 toplevel-binding: binding
 # toplevel-binding: [SHADOW] NAME COLONCOLON noparen-arrow-ann
