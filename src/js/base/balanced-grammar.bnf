@@ -36,7 +36,7 @@ multi-let-expr: LET let-binding (COMMA let-binding)* (BLOCK|COLON) block END
 let-binding: let-expr | var-expr
 letrec-expr: LETREC let-expr (COMMA let-expr)* (BLOCK|COLON) block END
 
-type-bind: NAME ty-params EQUALS ann
+type-bind: ty-params EQUALS ann
 
 type-let-bind: [type-bind] 
 type-let-expr: TYPE-LET type-let-bind (COMMA type-let-bind)* (BLOCK|COLON) block END
