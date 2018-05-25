@@ -37,9 +37,8 @@ let-binding: let-expr | var-expr
 letrec-expr: LETREC let-expr (COMMA let-expr)* (BLOCK|COLON) block END
 
 type-bind: NAME ty-params EQUALS ann
-newtype-bind: NEWTYPE NAME NAME
 
-type-let-bind: type-bind | newtype-bind
+type-let-bind: [type-bind] 
 type-let-expr: TYPE-LET type-let-bind (COMMA type-let-bind)* (BLOCK|COLON) block END
 
 contract-stmt: NAME COLONCOLON (ann | noparen-arrow-ann)
