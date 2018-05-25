@@ -5,7 +5,7 @@ R(["pyret-base/js/balanced-tokenizer", "pyret-base/js/balanced-parser", "fs"], f
   function parse(str) {
     const toks = T.Tokenizer;
     toks.tokenizeFrom(str);
-    var parsed = G.PyretGrammar.parse(toks);
+    var parsed = G.BalancedGrammar.parse(toks);
     if (!parsed) {
       return false;
     }
