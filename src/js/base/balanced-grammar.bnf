@@ -31,7 +31,6 @@ tuple-binding: LBRACE (binding SEMI)* binding [SEMI] RBRACE [name-binding]
 name-binding: [COLONCOLON ann]
 
 toplevel-binding: binding
-# toplevel-binding: [SHADOW] NAME COLONCOLON noparen-arrow-ann
 multi-let-expr: LET let-binding (COMMA let-binding)* (BLOCK|COLON) block END
 let-binding: let-expr | var-expr
 letrec-expr: LETREC let-expr (COMMA let-expr)* (BLOCK|COLON) block END
