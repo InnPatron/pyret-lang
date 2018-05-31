@@ -70,7 +70,10 @@ assign-expr: NAME COLONEQUALS binop-expr
 
 when-expr: WHEN binop-expr (BLOCK|COLON) block END
 
-binop-expr: expr (expr)*
+binop-expr: expr (binop expr)*
+
+binop: PLUS | DASH | STAR | SLASH | LEQ | GEQ | EQUALEQUAL | SPACESHIP | EQUALTILDE
+     | NEQ  | LT  | GT | AND | OR | CARET
 
 expr: paren-expr
     | lambda-expr | method-expr | app-expr
