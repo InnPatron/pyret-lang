@@ -132,14 +132,13 @@ tuple-get: expr DOT LBRACE RBRACE
 
 obj-expr: LBRACE obj-fields RBRACE | LBRACE RBRACE
 obj-fields: obj-field (COMMA obj-field)* [COMMA]
-obj-field: key COLON binop-expr
-     | REF key [COLONCOLON ann] COLON binop-expr
-     | METHOD key fun-header (BLOCK|COLON) block where-clause END
+obj-field: COLON binop-expr
+     | REF [COLONCOLON ann] COLON binop-expr
+     | METHOD fun-header (BLOCK|COLON) block where-clause END
 
 fields: field (COMMA field)* [COMMA]
-field: key COLON binop-expr
-     | METHOD key fun-header (BLOCK|COLON) block where-clause END
-key: NAME
+field: COLON binop-expr
+     | METHOD fun-header (BLOCK|COLON) block where-clause END
 
 construct-expr: LBRACK construct-modifier binop-expr COLON trailing-opt-comma-binops RBRACK
 construct-modifier: | LAZY
@@ -189,10 +188,8 @@ table-update : TABLE-UPDATE expr [USING binding (COMMA binding)*] COLON obj-fiel
 table-extend : TABLE-EXTEND expr [USING binding (COMMA binding)*] COLON table-extend-fields END
 table-extend-fields: list-table-extend-field* table-extend-field [COMMA]
 list-table-extend-field: table-extend-field COMMA
-table-extend-field: key [COLONCOLON ann] COLON binop-expr
-# Commenting this out until we know whether or not it makes sense
-#     | REF key [COLONCOLON ann] COLON binop-expr
-     | key [COLONCOLON ann] COLON expr OF NAME
+table-extend-field: [COLONCOLON ann] COLON binop-expr
+     | [COLONCOLON ann] COLON expr OF NAME
 
 # More informative to allow missing load-table-specs to parse and mark it as a
 # well-formedness error than to reject it at parse-time
