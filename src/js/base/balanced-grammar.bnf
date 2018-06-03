@@ -196,8 +196,7 @@ table-extend-field: [COLONCOLON ann] COLON binop-expr
 load-table-expr: LOAD-TABLE COLON table-headers [load-table-specs] END
 
 load-table-specs: load-table-spec* load-table-spec
-load-table-spec: SOURCECOLON expr
-               | SANITIZE NAME USING expr
+load-table-spec: [SOURCECOLON] expr
 
 user-block-expr: BLOCK block END
 
