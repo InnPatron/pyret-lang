@@ -161,7 +161,7 @@ END
 dot-expr: expr DOT
 bracket-expr: expr LBRACK binop-expr RBRACK
 
-get-bang-expr: expr BANG NAME
+get-bang-expr: expr BANG
 
 extend-expr: expr DOT LBRACE fields RBRACE
 update-expr: expr BANG LBRACE fields RBRACE
