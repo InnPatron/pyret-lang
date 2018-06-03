@@ -56,9 +56,9 @@ check-test: binop-expr [(PARENSPACE|PARENNOSPACE) binop-expr RPAREN] binop-expr
 
 
 data-expr: DATA ty-params COLON [first-data-variant] data-variant* data-sharing where-clause END
-variant-constructor: NAME variant-members
-first-data-variant: variant-constructor data-with | NAME data-with
-data-variant: BAR variant-constructor data-with | BAR NAME data-with
+variant-constructor: variant-members
+first-data-variant: variant-constructor data-with | data-with
+data-variant: BAR variant-constructor data-with | BAR data-with
 variant-members: PARENNOSPACE [variant-member (COMMA variant-member)*] RPAREN
 variant-member: [REF] binding
 data-with: [WITH fields]
