@@ -6,6 +6,98 @@ define("pyret-base/js/balanced-tokenizer", ["jglr/jglr"], function(E) {
   const GenTokenizer = E.Tokenizer;
   const STICKY_REGEXP = E.STICKY_REGEXP;
 
+  const whitelist = new Set([
+    "COLON",
+    "COLONCOLON",
+    "SEMI",
+    "OTHERWISECOLON",
+    "THENCOLON",
+    "SOURCECOLON",
+
+    "COMMA",
+    "DOT",
+    "DOTDOTDOT",
+
+    "PARENNOSPACE",
+    "PARENAFTERBRACE",
+
+    "LPAREN",
+    "RPAREN",
+    "LBRACE",
+    "RBRACE",
+    "LBRACK",
+    "RBRACK",
+    "LANGLE",
+    "RANGLE",
+
+    "THINARROW",
+    "THICKARROW",
+
+    "BAR",
+
+    "COLONEQUALS",
+    "EQUALS",
+    "EQUALEQUAL",
+
+    "BANG",
+
+    "PLUS",
+    "DASH",
+    "STAR",
+    "SLASH",
+    "LEQ",
+    "GEQ",
+    "SPACESHIP",
+    "EQUALTILDE",
+    "NEQ",
+    "LT",
+    "GT",
+    "AND",
+    "OR",
+    "CARET",
+
+    "VAR",
+    "REC",
+    "LET",
+    "LETREC",
+    "TYPE-LET",
+
+    "TYPE",
+    
+    "LAZY",
+
+    "ROW",
+
+    "END",
+
+    "IF",
+    "ELSEIF",
+    "ELSE",
+
+    "FOR",
+    "FROM",
+    
+    "LOAD-TABLE",
+    "CASES",
+    "ASK",
+    "TABLE",
+    "LAM",
+    "METHOD",
+    "DATA",
+    "CHECK",
+    "CHECKCOLON",
+    "EXAMPLESCOLON",
+    "EXAMPLES",
+    "SPY",
+    "BLOCK",
+    "FUN",
+  ]);
+
+  function filter(tokType) {
+    // Return 'true' to allow token
+    return whitelist.has(tokType);
+  }
+
   const escapes = new RegExp("^(.*?)\\\\([\\\\\"\'nrt]|u[0-9A-Fa-f]{1,4}|x[0-9A-Fa-f]{1,2}|[0-7]{1,3}|[\r\n]{1,2})");
   function fixEscapes(s) {
     var ret = "";
@@ -34,7 +126,7 @@ define("pyret-base/js/balanced-tokenizer", ["jglr/jglr"], function(E) {
   }
 
   function Tokenizer(ignore_ws, Tokens) {
-    GenTokenizer.call(this, ignore_ws, Tokens);
+    GenTokenizer.call(this, ignore_ws, Tokens, filter);
     this.parenIsForExp = true; // initialize this at the beginning of file to true
   }
   Tokenizer.prototype = Object.create(GenTokenizer.prototype);
@@ -42,9 +134,7 @@ define("pyret-base/js/balanced-tokenizer", ["jglr/jglr"], function(E) {
     GenTokenizer.prototype.tokenizeFrom.call(this, str);
     this.parenIsForExp = "PARENSPACE";
   }
-  Tokenizer.prototype.filter = function(tok_type) {
-    return tok_type == "FUN" || tok_type == "NAME";
-  }
+  
   Tokenizer.prototype.makeToken = function (tok_type, s, pos) {
     switch(tok_type) {
     case "STRING": s = fixEscapes(s); break;
