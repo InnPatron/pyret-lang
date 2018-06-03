@@ -174,7 +174,7 @@ if-pipe-branch: BAR binop-expr THENCOLON block
 cases-binding: [REF] binding
 cases-args: PARENNOSPACE [cases-binding (COMMA cases-binding)*] RPAREN
 cases-expr: CASES (PARENSPACE|PARENNOSPACE) ann RPAREN binop-expr (BLOCK|COLON) cases-branch* [BAR ELSE THICKARROW block] END
-cases-branch: BAR NAME [cases-args] THICKARROW block
+cases-branch: BAR [cases-args] THICKARROW block
 
 for-bind: binding FROM binop-expr
 for-expr: FOR expr PARENNOSPACE [for-bind (COMMA for-bind)*] RPAREN return-ann (BLOCK|COLON) block END
