@@ -42,7 +42,7 @@ type-let-expr: TYPE-LET type-let-bind (COMMA type-let-bind)* (BLOCK|COLON) block
 
 contract-stmt: COLONCOLON (ann | noparen-arrow-ann)
 
-fun-expr: FUN NAME fun-header (BLOCK|COLON) block where-clause END
+fun-expr: FUN fun-header (BLOCK|COLON) block where-clause END
 fun-header: ty-params args return-ann
 ty-params: [(LANGLE|LT) (COMMA)* (RANGLE|GT)]
 args: (PARENNOSPACE|PARENAFTERBRACE) [binding (COMMA binding)*] RPAREN
