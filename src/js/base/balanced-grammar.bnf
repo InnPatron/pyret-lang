@@ -146,7 +146,7 @@ construct-modifier: | LAZY
 table-expr: TABLE table-headers table-rows END
 table-headers: [list-table-header* table-header]
 list-table-header: table-header COMMA
-table-header: NAME [COLONCOLON ann]
+table-header: [COLONCOLON ann]
 table-rows: [table-row* table-row]
 table-row: ROW table-items
 table-items: [list-table-item* binop-expr]
