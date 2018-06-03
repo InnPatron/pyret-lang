@@ -9,9 +9,9 @@ R(["pyret-base/js/balanced-tokenizer", "pyret-base/js/balanced-parser", "fs"], f
     if (!parsed) {
       return false;
     }
-    var countParses = G.PyretGrammar.countAllParses(parsed);
+    var countParses = G.BalancedGrammar.countAllParses(parsed);
     if (countParses === 1) {
-      var ast = G.PyretGrammar.constructUniqueParse(parsed);
+      var ast = G.BalancedGrammar.constructUniqueParse(parsed);
       return ast;
     }
     else {
