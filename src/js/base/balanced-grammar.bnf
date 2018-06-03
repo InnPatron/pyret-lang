@@ -189,7 +189,7 @@ table-extend : TABLE-EXTEND expr [binding (COMMA binding)*] COLON table-extend-f
 table-extend-fields: list-table-extend-field* table-extend-field [COMMA]
 list-table-extend-field: table-extend-field COMMA
 table-extend-field: [COLONCOLON ann] COLON binop-expr
-     | [COLONCOLON ann] COLON expr OF NAME
+     | [COLONCOLON ann] COLON expr
 
 # More informative to allow missing load-table-specs to parse and mark it as a
 # well-formedness error than to reject it at parse-time
