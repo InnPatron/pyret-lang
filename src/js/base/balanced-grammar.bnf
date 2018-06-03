@@ -40,7 +40,7 @@ type-bind: ty-params EQUALS ann
 type-let-bind: [type-bind] 
 type-let-expr: TYPE-LET type-let-bind (COMMA type-let-bind)* (BLOCK|COLON) block END
 
-contract-stmt: NAME COLONCOLON (ann | noparen-arrow-ann)
+contract-stmt: COLONCOLON (ann | noparen-arrow-ann)
 
 fun-expr: FUN NAME fun-header (BLOCK|COLON) block where-clause END
 fun-header: ty-params args return-ann
