@@ -180,7 +180,7 @@ for-bind: binding FROM binop-expr
 for-expr: FOR expr PARENNOSPACE [for-bind (COMMA for-bind)*] RPAREN return-ann (BLOCK|COLON) block END
 
 column-order : (ASCENDING|DESCENDING)
-table-select : TABLE-SELECT NAME (COMMA NAME)* FROM expr END
+table-select : TABLE-SELECT (COMMA)* FROM expr END
 table-filter : TABLE-FILTER expr [USING binding (COMMA binding)*] COLON binop-expr END
 table-order  : TABLE-ORDER  expr COLON column-order (COMMA column-order)* END
 table-extract: TABLE-EXTRACT NAME FROM expr END
