@@ -66,7 +66,7 @@ data-sharing: [SHARING fields]
 
 var-expr: VAR toplevel-binding EQUALS binop-expr
 rec-expr: REC toplevel-binding EQUALS binop-expr
-assign-expr: NAME COLONEQUALS binop-expr
+assign-expr: COLONEQUALS binop-expr
 
 when-expr: WHEN binop-expr (BLOCK|COLON) block END
 
