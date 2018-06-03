@@ -158,7 +158,7 @@ reactor-expr: REACTOR COLON
   fields
 END
 
-dot-expr: expr DOT NAME
+dot-expr: expr DOT
 bracket-expr: expr LBRACK binop-expr RBRACK
 
 get-bang-expr: expr BANG NAME
