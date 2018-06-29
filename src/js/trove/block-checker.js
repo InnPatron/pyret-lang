@@ -6,43 +6,36 @@
   provides: {},
   theModule: function(RUNTIME, NAMESPACE, uri, tokenizer) {
 
-    const END_DELIMITED = new Map(
-        [
-        ["PROVIDE", genericBlockHandler],
-        ["SPY", genericBlockHandler ],
-        ["LET", genericBlockHandler],
-        ["LETREC", genericBlockHandler],
-        ["TYPE-LET", genericBlockHandler],
-        ["FUN", genericBlockHandler],
-        ["CHECK", genericBlockHandler],
-        ["EXAMPLES", genericBlockHandler],
-        ["CHECKCOLON", genericBlockHandler],
-        ["EXAMPLESCOLON", genericBlockHandler],
-        ["DATA", genericBlockHandler],
-        ["WHEN", genericBlockHandler],
-        ["LAM", genericBlockHandler],
-        ["METHOD", genericBlockHandler],
-        ["TABLE", genericBlockHandler],
-        ["REACTOR", genericBlockHandler],
-        ["IF", genericBlockHandler],
-        ["ASK", genericBlockHandler],
-        ["CASES", genericBlockHandler],
-        ["FOR", genericBlockHandler],
-        ["TABLE-SELECT", genericBlockHandler],
-        ["TABLE-FILTER", genericBlockHandler],
-        ["TABLE-ORDER", genericBlockHandler],
-        ["TABLE-EXTRACT", genericBlockHandler],
-        ["TABLE-UPDATE", genericBlockHandler],
-        ["TABLE-EXTEND", genericBlockHandler],
-        ["LOAD-TABLE", genericBlockHandler],
-        ["BLOCK", genericBlockHandler],
-        ]);
-
-    const EMBEDDABLE = new Set(
-        [
-        "BLOCK",
-        // TODO: Add more end-delimited, embeddable block starters
-        ]);
+    const END_DELIMITED = {
+        "PROVIDE": provideHandler,
+        "SPY": genericBlockHandler ,
+        "LET": genericBlockHandler,
+        "LETREC": genericBlockHandler,
+        "TYPE-LET": genericBlockHandler,
+        "FUN": genericBlockHandler,
+        "CHECK": genericBlockHandler,
+        "EXAMPLES": genericBlockHandler,
+        "CHECKCOLON": genericBlockHandler,
+        "EXAMPLESCOLON": genericBlockHandler,
+        "DATA": genericBlockHandler,
+        "WHEN": genericBlockHandler,
+        "LAM": genericBlockHandler,
+        "METHOD": genericBlockHandler,
+        "TABLE": genericBlockHandler,
+        "REACTOR": genericBlockHandler,
+        "IF": genericBlockHandler,
+        "ASK": genericBlockHandler,
+        "CASES": genericBlockHandler,
+        "FOR": genericBlockHandler,
+        "TABLE-SELECT": genericBlockHandler,
+        "TABLE-FILTER": genericBlockHandler,
+        "TABLE-ORDER": genericBlockHandler,
+        "TABLE-EXTRACT": genericBlockHandler,
+        "TABLE-UPDATE": genericBlockHandler,
+        "TABLE-EXTEND": genericBlockHandler,
+        "LOAD-TABLE": genericBlockHandler,
+        "BLOCK": genericBlockHandler,
+    };
 
     function start(state, toks) {
 
@@ -51,6 +44,31 @@
       if (toks.hasNext()) {
         pushHandler(state, topLevelScanner);
       }
+    }
+
+    function provideHandler(state, toks) {
+      if (!toks.hasNext()) {
+        // TODO ERROR: Encountered PROVIDE, expected more tokens
+        return;
+      }
+
+      var next = toks.next().name;
+      if (next == "STAR") {
+        popHandler(state);
+        popTok(state);
+      } else {
+        // Assume provide statement. Take until END
+        while (next != "END") {
+          if (!toks.hasNext()) {
+            // TODO ERROR: Unended 'provide' statement
+            return;
+          }
+          next = toks.next();
+        }
+      }
+
+      popTok(state);
+      popHandler(state);
     }
 
     function topLevelScanner(state, toks) { 
