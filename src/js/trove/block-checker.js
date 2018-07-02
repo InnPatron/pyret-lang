@@ -37,6 +37,23 @@
         "BLOCK": genericBlockHandler,
     };
 
+    const SUBKEYWORDS = {
+      "IF": ["BLOCK", "ELSE IF", "ELSE"], 
+      "WHEN": ["BLOCK"],
+      "FUN": ["BLOCK", "WHERE"], 
+      "METHOD": ["BLOCK", "WHERE"], 
+      "LAM": ["BLOCK"],
+      "FOR": ["BLOCK", "DO"], 
+      "LET": ["BLOCK"], 
+      "LETREC": ["BLOCK"], 
+      "TYPE-LET": ["BLOCK"],
+      "CASES": ["BLOCK"], 
+      "ASK": ["BLOCK", "THEN", "OTHERWISE"],
+      "DATA": ["SHARING", "WHERE"], 
+      "TABLE": ["ROW"], 
+      "LOAD-TABLE": ["SANITIZE", "SOURCE"]
+    };
+
     function start(state, toks) {
 
       popHandler(state); // Remove self
