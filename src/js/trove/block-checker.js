@@ -46,10 +46,10 @@
 
     function start(state, toks) {
 
-      state.handler.pop(); // Remove self
+      popHandler(state); // Remove self
 
       if (toks.hasNext()) {
-        state.handler.push(topLevelScanner);
+        pushHandler(state, topLevelScanner);
       }
     }
 
@@ -63,12 +63,35 @@
 
       var nextHandler = END_DELIMITED[nextName];
       if (nextHandler !== undefined) {
-        state.handler.push(nextHandler);
+        pushHandler(state, nextHandler);
+        pushTok(state, nextTok);
       }
     }
 
     function genericBlockHandler(state, toks) {
       // TODO: Implement
+    }
+
+    function popHandler(state) {
+      return state.handler.pop();
+    }
+
+    function pushHandler(state, handler) {
+      state.handler.push(handler);
+    }
+
+    function popTok(state) {
+      return state.delimiters.pop();
+    }
+
+    function pushTok(state, tokenName) {
+      state.delimiters.push(tokenName);
+    }
+    
+    function peekTok(state) {
+      var result = state.delimiters.pop();
+      state.delimiters.push(result);
+      return result;
     }
 
     function check(data, fileName) {
@@ -78,6 +101,7 @@
       var state = new Object();
       state.handler = [];
       state.handler.push(start);
+      state.delimiters = [];
       state.end = false;
 
       while (state.handler.length > 0) {
