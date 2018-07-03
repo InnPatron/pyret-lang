@@ -105,7 +105,48 @@
     }
 
     function genericBlockHandler(state, toks) {
-      // TODO: Implement
+      if (!toks.hasNext()) {
+        // TODO ERROR: Expected an END
+        return;
+      }
+
+      var nextTok = toks.next();
+      var nextName = nextTok.name;
+
+      while (nextName != "END") {
+        var nextHandler = END_DELIMITED[nextName];
+        if (nextHandler !== undefined) {
+          // Found a keyword
+          var subkeywords = SUBKEYWORDS[peekTok(state)];
+
+          if (subkeywords === undefined) {
+            // TODO: Found a keyword not allowed
+            return;
+          }
+
+          if (!subkewords.includes(nextName)) {
+            // TODO: Found a keyword not allowed
+            return;
+          }
+
+          // Subkeyword allowed
+          pushTok(state, nextTok);
+          pushHandler(state, nextHandler);
+          return;
+        }
+
+        // Scan next token
+        if (!toks.hasNext()) {
+          // TODO ERROR: Expected an end
+          return;
+        }
+        nextTok = toks.next();
+        nextName = nextTok.name;
+      }
+
+      // Remove this block
+      popTok(state);
+      popHandler(state);
     }
 
     function popHandler(state) {
