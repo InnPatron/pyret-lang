@@ -94,7 +94,8 @@
         return;
       }
 
-      var nextTok = toks.next().name;
+      var nextTok = toks.next();
+      var nextName = nextTok.name;
 
       var nextHandler = END_DELIMITED[nextName];
       if (nextHandler !== undefined) {
