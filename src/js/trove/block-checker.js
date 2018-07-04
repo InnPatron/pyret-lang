@@ -54,6 +54,17 @@
       "LOAD-TABLE": ["SANITIZE", "SOURCE"]
     };
 
+    const STATEMENT_BLOCK_STARTS = new Set([
+      "SPY",
+      "FUN",
+      "DATA",
+      "WHEN",
+      "CHECK",
+      "EXAMPLES",
+      "CHECKCOLON",
+      "EXAMPLESCOLON",
+    ]);
+
     function start(state, toks) {
 
       popHandler(state); // Remove self
