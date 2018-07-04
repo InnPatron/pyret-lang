@@ -75,13 +75,7 @@
         popTok(state);
       } else {
         // Assume provide statement. Take until END
-        while (next != "END") {
-          if (!toks.hasNext()) {
-            // TODO ERROR: Unended 'provide' statement
-            return;
-          }
-          next = toks.next();
-        }
+        genericBlockHandler(state, toks);
       }
 
       popTok(state);
