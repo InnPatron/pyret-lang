@@ -65,6 +65,28 @@
       "EXAMPLESCOLON",
     ]);
 
+    const EXPR_BLOCK_STARTS = new Set([
+      "LAM",
+      "METHOD",
+      "IF",
+      "ASK",
+      "CASES",
+      "FOR",
+      "BLOCK",
+      "LET",
+      "LETREC",
+      "TYPE-LET",
+      "TABLE-SELECT",
+      "TABLE-SELECT",
+      "TABLE-FILTER",
+      "TABLE-ORDER",
+      "TABLE-EXTRACT",
+      "TABLE-UPDATE",
+      "TABLE-EXTEND",
+      "LOAD-TABLE",
+      "REACTOR",
+    ]);
+
     function start(state, toks) {
 
       popHandler(state); // Remove self
