@@ -54,7 +54,7 @@
       "LOAD-TABLE": ["SANITIZE", "SOURCE"]
     };
 
-    const STATEMENT_BLOCK_STARTS = new Set([
+    const STATEMENT_BLOCK_STARTS = [
       "SPY",
       "FUN",
       "DATA",
@@ -63,9 +63,9 @@
       "EXAMPLES",
       "CHECKCOLON",
       "EXAMPLESCOLON",
-    ]);
+    ].concat(EXPR_BLOCK_STARTS);
 
-    const EXPR_BLOCK_STARTS = new Set([
+    const EXPR_BLOCK_STARTS = [
       "LAM",
       "METHOD",
       "IF",
@@ -85,7 +85,7 @@
       "TABLE-EXTEND",
       "LOAD-TABLE",
       "REACTOR",
-    ]);
+    ];
 
     function start(state, toks) {
 
