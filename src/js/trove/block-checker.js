@@ -241,7 +241,7 @@
     }
 
     function blockCheck(data, fileName) {
-      RUNTIME.ffi.checkArity(2, arguments, "blockCheck", false);
+      RUNTIME.ffi.checkArity(2, arguments, "block-check", false);
       RUNTIME.checkString(data);
       RUNTIME.checkString(fileName);
       return check(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
