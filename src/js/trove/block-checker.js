@@ -65,10 +65,10 @@
         "TABLE-UPDATE": EXPR_BLOCK_STARTS,
         "TABLE-EXTEND": EXPR_BLOCK_STARTS,
         "LOAD-TABLE": EXPR_BLOCK_STARTS,
-        "BLOCK": STATEMENT_BLOCK_STARTS,
+        "BLOCK": STMT_BLOCK_STARTS,
     };
 
-    const STATEMENT_BLOCK_STARTS = [
+    const STMT_BLOCK_STARTS = [
       "SPY",
       "FUN",
       "DATA",
