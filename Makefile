@@ -237,6 +237,7 @@ test: pyret-test type-check-test
 parse-test: tests/parse/parse.js build/phaseA/js/pyret-tokenizer.js build/phaseA/js/pyret-parser.js
 	cd tests/parse/ && $(NODE) test.js require-test-runner/
 
+BLOCK_CK_TEST_FILES := $(wildcard tests/block-checker/tests/*.arr)
 TEST_FILES := $(wildcard tests/pyret/tests/*.arr)
 TYPE_TEST_FILES := $(wildcard tests/type-check/bad/*.arr) $(wildcard tests/type-check/good/*.arr) $(wildcard tests/type-check/should/*.arr) $(wildcard tests/type-check/should-not/*.arr)
 REG_TEST_FILES := $(wildcard tests/pyret/regression/*.arr)
@@ -258,10 +259,19 @@ tests/pyret/main2.jarr: phaseA tests/pyret/main2.arr  $(TEST_FILES)
 		--build-runnable tests/pyret/main2.arr \
 		-check-all # NOTE(joe): check-all doesn't yet do anything
 
+tests/block-checker/main.jarr: phaseA tests/block-checker/main.arr $(BLOCK_CK_TEST_FILES)
+	$(TEST_BUILD) \
+		--outfile tests/block-checker/main.jarr \
+		--build-runnable tests/block-checker/main.arr \
+		-check-all # NOTE(joe): check-all doesn't yet do anything
 
 .PHONY : pyret-test
 pyret-test: phaseA tests/pyret/main2.jarr
 	$(NODE) tests/pyret/main2.jarr
+
+.PHONY : block-ck-test
+block-ck-test: phaseA tests/block-checker/main.jarr
+	$(NODE) tests/block-checker/main.jarr
 
 .PHONY : regression-test
 regression-test: tests/pyret/regression.jarr
