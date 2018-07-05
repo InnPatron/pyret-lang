@@ -230,9 +230,14 @@
         currentHandler(state, toks);
 
         if (state.err !== undefined) {
-          return state.err;
+          return RUNTIME.ffi.makeSome(RUNTIME.makeObject({
+            message: state.err,
+            lastDelim: peekTok(state),
+          }));
         }
       }
+
+      return RUNTIME.ffi.makeNone();
     }
 
     function blockCheck(data, fileName) {
