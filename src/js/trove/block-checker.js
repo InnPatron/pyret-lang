@@ -113,6 +113,7 @@
     function provideHandler(state, toks) {
       if (!toks.hasNext()) {
         // TODO ERROR: Encountered PROVIDE, expected more tokens
+        state.err = "Unclosed PROVIDE statement";
         return;
       }
 
@@ -147,7 +148,7 @@
 
     function genericBlockHandler(state, toks) {
       if (!toks.hasNext()) {
-        // TODO ERROR: Expected an END
+        state.err = "Unclosed block";
         return;
       }
 
@@ -161,12 +162,12 @@
           var subkeywords = SUBKEYWORDS[peekTok(state)];
 
           if (subkeywords === undefined) {
-            // TODO: Found a keyword not allowed
+            state.err = nextName + " is not a valid subkeyword";
             return;
           }
 
           if (!subkewords.includes(nextName)) {
-            // TODO: Found a keyword not allowed
+            state.err = nextName + " is not a valid subkeyword";
             return;
           }
 
@@ -178,7 +179,7 @@
 
         // Scan next token
         if (!toks.hasNext()) {
-          // TODO ERROR: Expected an end
+          state.err = "Unclosed block";
           return;
         }
         nextTok = toks.next();
