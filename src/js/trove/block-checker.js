@@ -6,6 +6,39 @@
   provides: {},
   theModule: function(RUNTIME, NAMESPACE, uri, tokenizer) {
 
+    const EXPR_BLOCK_STARTS = [
+      "LAM",
+      "METHOD",
+      "IF",
+      "ASK",
+      "CASES",
+      "FOR",
+      "BLOCK",
+      "LET",
+      "LETREC",
+      "TYPE-LET",
+      "TABLE-SELECT",
+      "TABLE-SELECT",
+      "TABLE-FILTER",
+      "TABLE-ORDER",
+      "TABLE-EXTRACT",
+      "TABLE-UPDATE",
+      "TABLE-EXTEND",
+      "LOAD-TABLE",
+      "REACTOR",
+    ];
+
+    const STMT_BLOCK_STARTS = [
+      "SPY",
+      "FUN",
+      "DATA",
+      "WHEN",
+      "CHECK",
+      "EXAMPLES",
+      "CHECKCOLON",
+      "EXAMPLESCOLON",
+    ].concat(EXPR_BLOCK_STARTS);
+
     const END_DELIMITED = {
         "PROVIDE": provideHandler,
         "SPY": genericBlockHandler ,
@@ -67,39 +100,6 @@
         "LOAD-TABLE": EXPR_BLOCK_STARTS,
         "BLOCK": STMT_BLOCK_STARTS,
     };
-
-    const STMT_BLOCK_STARTS = [
-      "SPY",
-      "FUN",
-      "DATA",
-      "WHEN",
-      "CHECK",
-      "EXAMPLES",
-      "CHECKCOLON",
-      "EXAMPLESCOLON",
-    ].concat(EXPR_BLOCK_STARTS);
-
-    const EXPR_BLOCK_STARTS = [
-      "LAM",
-      "METHOD",
-      "IF",
-      "ASK",
-      "CASES",
-      "FOR",
-      "BLOCK",
-      "LET",
-      "LETREC",
-      "TYPE-LET",
-      "TABLE-SELECT",
-      "TABLE-SELECT",
-      "TABLE-FILTER",
-      "TABLE-ORDER",
-      "TABLE-EXTRACT",
-      "TABLE-UPDATE",
-      "TABLE-EXTEND",
-      "LOAD-TABLE",
-      "REACTOR",
-    ];
 
     function start(state, toks) {
 
