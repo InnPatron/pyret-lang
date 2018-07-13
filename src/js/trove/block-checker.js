@@ -112,8 +112,7 @@
 
     function provideHandler(state, toks) {
       if (!toks.hasNext()) {
-        // TODO ERROR: Encountered PROVIDE, expected more tokens
-        state.err = "Unclosed PROVIDE statement";
+        state.err = null;
         return;
       }
 
@@ -148,7 +147,7 @@
 
     function genericBlockHandler(state, toks) {
       if (!toks.hasNext()) {
-        state.err = "Unclosed block";
+        state.err = null;
         return;
       }
 
@@ -162,12 +161,12 @@
           var subkeywords = SUBKEYWORDS[peekTok(state)];
 
           if (subkeywords === undefined) {
-            state.err = nextName + " is not a valid subkeyword";
+            state.err = nextTok;
             return;
           }
 
           if (!subkewords.includes(nextName)) {
-            state.err = nextName + " is not a valid subkeyword";
+            state.err = nextTok;
             return;
           }
 
@@ -179,7 +178,7 @@
 
         // Scan next token
         if (!toks.hasNext()) {
-          state.err = "Unclosed block";
+          state.err = null;
           return;
         }
         nextTok = toks.next();
@@ -230,8 +229,16 @@
         currentHandler(state, toks);
 
         if (state.err !== undefined) {
+          var err;
+
+          if (state.err === null) {
+            err = RUNTIME.ffi.makeNone();
+          } else {
+            err = RUNTIME.ffi.makeSome(state.err);
+          }
+
           return RUNTIME.ffi.makeSome(RUNTIME.makeObject({
-            message: state.err,
+            errToken: err,
             lastDelim: peekTok(state),
           }));
         }
