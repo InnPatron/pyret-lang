@@ -500,6 +500,14 @@
       raise(makeModuleLoadFailureL(names));
     }
 
+    function throwMissingEnd(loc) {
+      raise(err("missing-end")(loc));
+    }
+
+    function throwMissingEndHint(startLoc, hintLoc) {
+      raise(err("missing-end-hint")(startLoc, hintLoc));
+    }
+
     function makeModuleLoadFailureL(names) {
       var namesList = makeList(names);
       return err("module-load-failure")(namesList);
@@ -657,6 +665,9 @@
       throwParseErrorBadNumber: throwParseErrorBadNumber,
       throwParseErrorBadOper: throwParseErrorBadOper,
       throwParseErrorBadCheckOper: throwParseErrorBadCheckOper,
+
+      throwMissingEnd: throwMissingEnd,
+      throwMissingEndHint: throwMissingEndHint,
 
       makeBadBracketException: makeBadBracketException,
       makeRecordFieldsFail: makeRecordFieldsFail,
