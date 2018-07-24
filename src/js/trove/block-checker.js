@@ -229,33 +229,75 @@
         currentHandler(state, toks);
 
         if (state.err !== undefined) {
-          var err;
 
-          if (state.err === null) {
-            err = RUNTIME.ffi.makeNone();
-          } else {
-            err = RUNTIME.ffi.makeSome(state.err);
-          }
-
-          return RUNTIME.ffi.makeSome(RUNTIME.makeObject({
-            errToken: err,
+          return {
+            errToken: state.err,
             lastDelim: peekTok(state),
-          }));
+          };
         }
       }
 
-      return RUNTIME.ffi.makeNone();
+      return null;
+    }
+
+    function errorHandling(errorObject) {
+      // Missing 'end' extended to EOF with no hints
+      if (errorObject.errToken === null) {
+        RUNTIME.ffi.throwMissingEnd(errorObject.lastDelim.pos);
+      }
+
+      // Generic error message
+      RUNTIME.ffi.throwMissingEndHint(errorObject.lastDelim.pos, errorObject.errToken.pos);
+    }
+
+    function blockCheckRaw(data, fileName) {
+      try {
+        var result = check(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
+
+        if (result === null) {
+          return RUNTIME.ffi.makeNone();
+        } else {
+          errorHandling(result);
+        }
+      } catch(e) {
+        if (RUNTIME.isPyretException(e)) {
+          return RUNTIME.ffi.makeSome(RUNTIME.makeObject({
+            exn: e.exn,
+          }));
+        } else {
+          throw e;
+        }
+      }
     }
 
     function blockCheck(data, fileName) {
       RUNTIME.ffi.checkArity(2, arguments, "block-check", false);
       RUNTIME.checkString(data);
       RUNTIME.checkString(fileName);
-      return check(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
+      var result = blockCheckRaw(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
+      return RUNTIME.ffi.cases(RUNTIME.ffi.isOption, "is-Option", result, {
+        left: function(err) {
+          var exn = RUNTIME.getField(err, "exn");
+          console.error(message);
+          RUNTIME.raise(exn);
+        },
+        right: function(ast) {
+          return ast;
+        }
+      });
+    }
+
+    function maybeBlockCheck(data, fileName) {
+      RUNTIME.ffi.checkArity(2, arguments, "maybe-block-check", false);
+      RUNTIME.checkString(data);
+      RUNTIME.checkString(fileName);
+
+      return blockCheckRaw(RUNTIME.unwrap(data), RUNTIME.unwrap(fileName));
     }
 
     return RUNTIME.makeModuleReturn({
           'block-check': RUNTIME.makeFunction(blockCheck, "block-check"),
+          'maybe-block-check': RUNTIME.makeFunction(maybeBlockCheck, "maybe-block-check"),
         }, {});
   }
 })
