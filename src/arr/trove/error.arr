@@ -2638,6 +2638,15 @@ data ParseError:
     method render-reason(self):
       ED.text("Expected a val binding or an expression, but got something else " + self.loc.format(true))
     end
+  | missing-end-hint(start-loc, hint-loc) with:
+    method render-reason(self):
+      [ED.error: 
+          [ED.para:
+            ED.text("Pyret expected an 'end' to "),
+            ED.loc(self.start-loc),
+            ED.text(". Perhaps you meant to insert one before "),
+            ED.loc(self.hint-loc)]]
+    end
   | fun-missing-colon(loc) with:
     method render-reason(self): ED.text("fun-missing-colon: " + self.loc.format(true)) end
   | fun-missing-end(loc) with:
