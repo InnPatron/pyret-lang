@@ -240,14 +240,16 @@
       return null;
     }
 
-    function errorHandling(errorObject) {
+    function errorHandling(fileName, errorObject) {
       // Missing 'end' extended to EOF with no hints
       if (errorObject.errToken === null) {
-        RUNTIME.ffi.throwMissingEnd(errorObject.lastDelim.pos);
+        RUNTIME.ffi.throwMissingEnd(RUNTIME.ffi.makePyretPos(fileName, errorObject.lastDelim.pos));
       }
 
       // Generic error message
-      RUNTIME.ffi.throwMissingEndHint(errorObject.lastDelim.pos, errorObject.errToken.pos);
+      RUNTIME.ffi.throwMissingEndHint(
+          RUNTIME.ffi.makePyretPos(fileName, errorObject.lastDelim.pos), 
+          RUNTIME.ffi.makePyretPos(fileName, errorObject.errToken.pos));
     }
 
     function blockCheckRaw(data, fileName) {
@@ -257,7 +259,7 @@
         if (result === null) {
           return RUNTIME.ffi.makeNone();
         } else {
-          errorHandling(result);
+          errorHandling(fileName, result);
         }
       } catch(e) {
         if (RUNTIME.isPyretException(e)) {
