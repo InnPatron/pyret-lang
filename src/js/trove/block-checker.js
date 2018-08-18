@@ -104,15 +104,6 @@
         "BLOCK": STMT_BLOCK_STARTS,
     };
 
-    function start(state, toks) {
-
-      popHandler(state); // Remove self
-
-      if (toks.hasNext()) {
-        pushHandler(state, topLevelScanner);
-      }
-    }
-
     function provideHandler(state, toks) {
       if (!toks.hasNext()) {
         state.err = null;
@@ -226,7 +217,7 @@
 
       var state = new Object();
       state.handler = [];
-      state.handler.push(start);
+      state.handler.push(topLevelScanner);
       state.delimiters = [];
       state.end = false;
 
