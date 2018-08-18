@@ -104,14 +104,26 @@
         "BLOCK": STMT_BLOCK_STARTS,
     };
 
+    function sanitizeName(name) {
+      // Remove any leading single quote
+      // NOTE: I cannot trace where the single quote is being inserted in
+      // According to the Token constructor in rnglr.js:382, the name field is NOT being modified
+      if (name.charAt(0) === '\'') {
+        return name.substring(1);
+      } else {
+        return name;
+      }
+    }
+
     function provideHandler(state, toks) {
       if (!toks.hasNext()) {
         state.err = null;
         return;
       }
 
-      var next = toks.next().name;
-      if (next == "STAR") {
+      var next = toks.next();
+      var nextName = sanitizeName(next.name);
+      if (nextName == "STAR") {
         popHandler(state);
         popTok(state);
       } else {
@@ -130,7 +142,7 @@
       }
 
       var nextTok = toks.next();
-      var nextName = nextTok.name;
+      var nextName = sanitizeName(nextTok.name);
 
       var nextHandler = END_DELIMITED[nextName];
       if (nextHandler !== undefined) {
@@ -146,13 +158,15 @@
       }
 
       var nextTok = toks.next();
-      var nextName = nextTok.name;
+      var nextName = sanitizeName(nextTok.name);
 
       while (nextName != "END") {
         var nextHandler = END_DELIMITED[nextName];
         if (nextHandler !== undefined) {
           // Found a keyword
-          var subkeywords = SUBKEYWORDS[peekTok(state)];
+          var currentTok = peekTok(state);
+          var currentName = sanitizeName(currentTok.name);
+          var subkeywords = SUBKEYWORDS[currentName];
 
           if (subkeywords === undefined) {
             state.err = nextTok;
@@ -176,7 +190,7 @@
           return;
         }
         nextTok = toks.next();
-        nextName = nextTok.name;
+        nextName = sanitizeName(nextTok.name);
       }
 
       // Remove this block
