@@ -173,7 +173,7 @@
             return;
           }
 
-          if (!subkewords.includes(nextName)) {
+          if (!subkeywords.includes(nextName)) {
             state.err = nextTok;
             return;
           }
