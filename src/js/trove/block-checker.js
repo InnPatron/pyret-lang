@@ -6,6 +6,8 @@
   provides: {},
   theModule: function(RUNTIME, NAMESPACE, uri, tokenizer) {
 
+    const UNHANDLED = "_UNHANDLED_";
+
     const EXPR_BLOCK_STARTS = [
       "LAM",
       "METHOD",
@@ -40,6 +42,7 @@
     ].concat(EXPR_BLOCK_STARTS);
 
     const END_DELIMITED = {
+        "UNTERMINATED-STRING": ustringHandler,
         "PROVIDE": provideHandler,
         "SPY": genericBlockHandler ,
         "LET": genericBlockHandler,
@@ -190,6 +193,11 @@
       popHandler(state);
     }
 
+    function ustringHandler(state, toks) {
+      state.err = UNHANDLED;
+      return;
+    }
+
     function popHandler(state) {
       return state.handler.pop();
     }
@@ -229,6 +237,10 @@
         currentHandler(state, toks);
 
         if (state.err !== undefined) {
+
+          if (state.err === UNHANDLED) {
+            return null;
+          }
 
           return {
             errToken: state.err,
