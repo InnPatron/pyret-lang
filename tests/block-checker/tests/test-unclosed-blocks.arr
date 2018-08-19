@@ -43,3 +43,48 @@ end
 ```
 ) is false
 end
+
+check "block checker should not pass unclosed provide statements":
+
+  does-pass(
+```
+  provide {
+    set: list-set,
+    list-set: list-set,
+    tree-set: tree-set,
+    empty-set: empty-list-set,
+    empty-list-set: empty-list-set,
+    empty-tree-set: empty-tree-set,
+    list-to-set: list-to-list-set,
+    list-to-list-set: list-to-list-set,
+    list-to-tree-set: list-to-tree-set,
+    fold: set-fold,
+    all: set-all,
+    any: set-any
+  } 
+
+  fun foo():
+  1 
+  end
+```
+) is false
+
+  does-pass(
+```
+  provide {
+    set: list-set,
+    list-set: list-set,
+    tree-set: tree-set,
+    empty-set: empty-list-set,
+    empty-list-set: empty-list-set,
+    empty-tree-set: empty-tree-set,
+    list-to-set: list-to-list-set,
+    list-to-list-set: list-to-list-set,
+    list-to-tree-set: list-to-tree-set,
+    fold: set-fold,
+    all: set-all,
+    any: set-any
+  } 
+```
+) is false
+end
