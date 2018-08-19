@@ -131,8 +131,6 @@
         genericBlockHandler(state, toks);
       }
 
-      popTok(state);
-      popHandler(state);
     }
 
     function topLevelScanner(state, toks) { 
