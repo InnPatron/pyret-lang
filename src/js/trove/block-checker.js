@@ -213,8 +213,8 @@
       return state.delimiters.pop();
     }
 
-    function pushTok(state, tokenName) {
-      state.delimiters.push(tokenName);
+    function pushTok(state, token) {
+      state.delimiters.push(token);
     }
     
     function peekTok(state) {
