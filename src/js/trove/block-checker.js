@@ -158,7 +158,7 @@
       var nextTok = toks.next();
       var nextName = sanitizeName(nextTok.name);
 
-      while (nextName != "END") {
+      while (nextName !== "END") {
         var nextHandler = END_DELIMITED[nextName];
         if (nextHandler !== undefined) {
           // Found a keyword
