@@ -61,7 +61,7 @@ block: stmt*
 stmt: type-expr | newtype-expr | spy-stmt
     | let-expr | fun-expr | data-expr | when-expr
     | var-expr | rec-expr | assign-expr | check-test | check-expr
-    | contract-stmt | while-expr
+    | contract-stmt | while-expr | iter-expr | iter-env-update | break
 
 while-expr: WHILE binop-expr (BLOCK|COLON) block END
 
@@ -73,6 +73,14 @@ type-expr: TYPE NAME ty-params EQUALS ann
 newtype-expr: NEWTYPE NAME AS NAME
 let-expr: toplevel-binding EQUALS binop-expr
 binding: name-binding | tuple-binding
+
+
+iter-expr: ITER iter-bind [iter-env-bind (COMMA iter-env-bind)*] return-ann (BLOCK|COLON) block END
+
+iter-bind: binding IN binop-expr
+iter-env-bind: binding FROM binop-expr
+iter-env-update: binding RIGHTTHINARROW binop-expr
+break: BREAK
 
 tuple-binding: LBRACE (binding SEMI)* binding [SEMI] RBRACE [AS name-binding]
 name-binding: [SHADOW] NAME [COLONCOLON ann]
