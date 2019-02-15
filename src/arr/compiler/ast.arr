@@ -1289,6 +1289,28 @@ data Expr:
             PP.str("spy ") + msg-source + str-colon, PP.commabreak, str-end, self.contents.map(_.tosource()))
       end
     end
+
+  | s-iter-expr(
+      l :: Loc,
+      iterator :: IterBind,
+      env-bindings :: List<IterEnvBind>,
+      body :: Expr,
+      blocky
+    ) with:
+    method label(self): "s-iter" end,
+    method tosource(self):
+      raise()
+    end
+  | s-iter-env-update(l :: Loc, id :: Name, value :: Expr) with:
+    method label(self): "s-iter-env-update" end,
+    method tosource(self):
+      raise()
+    end
+  | s-break-expr(l :: Loc) with:
+    method label(self): "s-break" end,
+    method tosource(self):
+      raise()
+    end
 sharing:
   method visit(self, visitor):
     self._match(visitor, lam(val): raise("No visitor field for " + self.label()) end)
@@ -1419,6 +1441,30 @@ data FieldName:
 sharing:
   method visit(self, visitor):
     self._match(visitor, lam(): raise("No visitor field for " + self.label()) end)
+  end
+end
+
+data IterBind:
+  | s-iter-bind(l :: Loc, bind :: Bind, value :: Expr) with:
+    method label(self): "s-iter-bind" end,
+    method tosource(self):
+      PP.group(self.bind.tosource() + break-one + str-from + break-one + self.value.tosource())
+    end
+sharing:
+  method visit(self, visitor):
+    self._match(visitor, lam(val): raise("No visitor field for " + self.label()) end)
+  end
+end
+
+data IterEnvBind:
+  | s-iter-env-bind(l :: Loc, bind :: Bind, value :: Expr) with:
+    method label(self): "s-iter-env-bind" end,
+    method tosource(self):
+      PP.group(self.bind.tosource() + break-one + str-from + break-one + self.value.tosource())
+    end
+sharing:
+  method visit(self, visitor):
+    self._match(visitor, lam(val): raise("No visitor field for " + self.label()) end)
   end
 end
 
