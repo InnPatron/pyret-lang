@@ -75,7 +75,7 @@ let-expr: toplevel-binding EQUALS binop-expr
 binding: name-binding | tuple-binding
 
 
-iter-expr: ITER iter-bind [iter-env-bind (COMMA iter-env-bind)*] return-ann (BLOCK|COLON) block END
+iter-expr: ITER iter-bind [COMMA iter-env-bind (COMMA iter-env-bind)*] (BLOCK|COLON) block END
 
 iter-bind: binding IN binop-expr
 iter-env-bind: binding FROM binop-expr
