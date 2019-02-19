@@ -1527,6 +1527,42 @@
         'ann': function(node) {
           // (ann a)
           return tr(node.kids[0]);
+        },
+        'iter-expr': function(node) {
+          // (iter-expr ITER iter-bind [COMMA iter-env-bind (COMMA iter-env-bind)*] (BLOCK|COLON) block END)
+
+          var iter_env_binds = empty;
+          if (node.kids.length > 5) {
+            iter_env_binds = makeListComma(node.kids, 3, node.kids.length - 3);
+          }
+          
+          var isBlock = (node.kids[node.kids.length - 3].name === "BLOCK");
+          return RUNTIME.getField(ast, 's-iter-expr')
+            .app(pos(node.pos), 
+              tr(node.kids[1]),                       // iter-bind
+              iter_env_binds,                         // iter-env-binds
+              tr(node.kids[node.kids.length - 2]),    // block
+              isBlock);
+        },
+        'iter-bind': function(node) {
+          // (iter-bind: name IN e)
+          return RUNTIME.getField(ast, 's-iter-bind')
+            .app(pos(node.pos), tr(node.kids[0]), tr(node.kids[2]));
+        },
+        'iter-env-bind': function(node) {
+          // (iter-env-bind: name FROM e)
+          return RUNTIME.getField(ast, 's-iter-env-bind')
+            .app(pos(node.pos), tr(node.kids[0]), tr(node.kids[2]));
+        },
+        'iter-env-update': function(node) {
+          // (iter-env-update: name RIGHTTHINARROW e)
+          return RUNTIME.getField(ast, 's-iter-env-update')
+            .app(pos(node.pos), name(node.kids[0]), tr(node.kids[2]));
+        },
+        'break': function(node) {
+          // (BREAK)
+          return RUNTIME.getField(ast, 's-break-expr')
+            .app(pos(node.pos));
         }
       };
       return tr(node);
