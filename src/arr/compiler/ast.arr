@@ -1141,6 +1141,16 @@ data Expr:
             break-one + str-arrow + break-one + self.ann.tosource() + blocky-colon(self.blocky))))
       PP.surround(INDENT, 1, header, self.body.tosource(), str-end)
     end
+  | s-while(
+      l :: Loc,
+      condition :: Expr,
+      body :: Expr,
+      blocky
+    ) with:
+    method label(self): "s-while" end,
+    method tosource(self):
+      raise("unimpl")   
+    end
   | s-check(
       l :: Loc,
       name :: Option<String>,

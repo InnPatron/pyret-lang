@@ -61,7 +61,9 @@ block: stmt*
 stmt: type-expr | newtype-expr | spy-stmt
     | let-expr | fun-expr | data-expr | when-expr
     | var-expr | rec-expr | assign-expr | check-test | check-expr
-    | contract-stmt
+    | contract-stmt | while-expr
+
+while-expr: WHILE binop-expr (BLOCK|COLON) block END
 
 spy-stmt: SPY [binop-expr] COLON [spy-contents] END
 spy-contents: spy-field (COMMA spy-field)*

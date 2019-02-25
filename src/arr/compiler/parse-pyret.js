@@ -1257,6 +1257,16 @@
             .app(pos(node.pos), tr(node.kids[1]), makeListComma(node.kids, 3, node.kids.length - 5),
                  tr(node.kids[node.kids.length - 4]), tr(node.kids[node.kids.length - 2]), isBlock);
         },
+        'while-expr': function(node) {
+          // (while-expr WHILE binop-expr (BLOCK|COLON) block END)
+
+          var isBlock = (node.kids[node.kids.length - 3].name == "BLOCK");
+          return RUNTIME.getField(ast, 's-while')
+            .app(pos(node.pos), 
+              tr(node.kids[1]),                        // translate condition
+              tr(node.kids[node.kids.length - 2]),    // translate block
+              isBlock);
+        },
         'user-block-expr': function(node) {
           // (user-block-expr BLOCK body END)
           return RUNTIME.getField(ast, 's-user-block')
