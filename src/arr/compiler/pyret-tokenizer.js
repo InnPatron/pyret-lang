@@ -116,6 +116,7 @@
     {name: "TABLE-EXTRACT", val: "extract"},
     {name: "FALSE", val: "false"},
     {name: "FOR", val: "for"},
+    {name: "WHILE", val: "while"},
     {name: "FROM", val: "from"},
     {name: "FUN", val: "fun"},
     {name: "HIDING", val: "hiding"},
