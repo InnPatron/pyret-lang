@@ -2963,6 +2963,14 @@ default-iter-visitor = {
       ):
     iterator.visit(self) and all(_.visit(self), bindings) and ann.visit(self) and body.visit(self)
   end,
+  method s-while(
+      self,
+      l :: Loc,
+      condition :: Expr,
+      body :: Expr,
+      blocky :: Boolean):
+    condition.visit(self) and body.visit(self)
+  end,
   method s-check(self, l :: Loc, name :: Option<String>, body :: Expr, keyword-check :: Boolean):
     body.visit(self)
   end,
