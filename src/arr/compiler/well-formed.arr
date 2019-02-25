@@ -857,6 +857,13 @@ well-formed-visitor = A.default-iter-visitor.{
     end
     iterator.visit(self) and lists.all(_.visit(self), bindings) and ann.visit(self) and body.visit(self)
   end,
+  method s-while(self, l, condition, body, blocky) block:
+    when not(blocky):
+      wf-blocky-blocks(l, [list: body])
+    end
+
+    condition.visit(self) and body.visit(self)
+  end,
   method s-frac(self, l, num, den) block:
     when den == 0:
       add-error(C.zero-fraction(l, num))
@@ -1276,6 +1283,9 @@ top-level-visitor = A.default-iter-visitor.{
   end,
   method s-for(_, l :: Loc, iterator :: A.Expr, bindings :: List<A.ForBind>, ann :: A.Ann, body :: A.Expr, blocky :: Boolean):
     well-formed-visitor.s-for(l, iterator, bindings, ann, body, blocky)
+  end,
+  method s-while(_, l :: Loc, condition :: A.Expr, body :: A.Expr, blocky :: Boolean):
+    well-formed-visitor.s-while(l, condition, body, blocky)
   end,
   method s-check(_, l :: Loc, name :: Option<String>, body :: A.Expr, keyword-check :: Boolean):
     well-formed-visitor.s-check(l, name, body, keyword-check)
