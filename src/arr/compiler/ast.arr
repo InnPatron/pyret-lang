@@ -2361,6 +2361,15 @@ default-map-visitor = {
     ):
     s-for(l, iterator.visit(self), bindings.map(_.visit(self)), ann.visit(self), body.visit(self), blocky)
   end,
+  method s-while(
+    self,
+    l :: Loc,
+    condition :: Expr,
+    body :: Expr,
+    blocky :: Boolean
+  ):
+    s-while(l, condition.visit(self), body.visit(self), blocky)
+  end,
   method s-check(self, l :: Loc, name :: Option<String>, body :: Expr, keyword-check :: Boolean):
     s-check(l, name, body.visit(self), keyword-check)
   end,
