@@ -606,6 +606,28 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
     | s-table-order(l, table, ordering) => nyi("s-table-order")
     | s-table-filter(l, column-binds, predicate) => nyi("s-table-filter")
     | s-spy-block(l, message, contents) => nyi("s-spy-block")
+    | s-while(l, condition, body, blocky) => 
+      {condition-value; condition-stmts} = compile-expr(context, condition)
+      {body-val; body-stmts} = compile-expr(context, body)
+
+      # translate into the form:
+      # while (true) {
+      #   ...condition-stmts...
+      #   if (!(condition)) {
+      #     break;
+      #   }
+      #   ...body-stmts...
+      #   body-value;
+      # }
+      js-cond-block = j-block(cl-sing(j-break))
+      js-cond = j-unop(j-parens(condition-value), j-not)
+      js-cond-if = j-if1(js-cond, js-cond-block)
+      js-body = j-block(
+        condition-stmts + cl-sing(js-cond-if) + body-stmts + cl-sing(j-expr(body-val))
+      )
+      js-while = j-while(j-true, js-body)
+
+      { j-id(NOTHING); cl-sing(js-while) }
     | else => raise("NYI (compile): " + torepr(expr))
   end
 
