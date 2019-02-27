@@ -631,6 +631,7 @@ fun _checking(e :: Expr, expect-type :: Type, top-level :: Boolean, context :: C
           raise("s-data-expr should have been handled by s-letrec")
         | s-for(l, iterator, bindings, ann, body) =>
           raise("s-for should have already been desugared")
+        | s-while(l, condition, body, blocky) => raise("nyi")
         | s-check(l, name, body, keyword-check) =>
           typing-result(e, expect-type, context)
       end
@@ -960,6 +961,15 @@ fun _synthesis(e :: Expr, top-level :: Boolean, context :: Context) -> TypingRes
       raise("s-data-expr should have been handled by s-letrec")
     | s-for(l, iterator, bindings, ann, body, blocky) =>
       _synthesis(DH.desugar-s-for(l, iterator, bindings, ann, body), top-level, context)
+    | s-while(l, condition, body, blocky) =>
+      checking(condition, t-boolean(l), false, context).bind(
+        lam(new-condition, _, shadow context):
+          synthesis(body, false, context).bind(
+            lam(new-body, body-type, shadow context):
+              new-while = A.s-while(l, new-condition, new-body, blocky)
+              typing-result(new-while, t-nothing(l), context)
+            end)
+        end)
     | s-check(l, name, body, keyword-check) =>
       result-type = new-existential(l, false)
       shadow context = context.add-variable(result-type)
