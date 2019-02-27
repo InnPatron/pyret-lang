@@ -1306,11 +1306,6 @@ data Expr:
     method tosource(self):
       raise()
     end
-  | s-break-expr(l :: Loc) with:
-    method label(self): "s-break" end,
-    method tosource(self):
-      raise()
-    end
 sharing:
   method visit(self, visitor):
     self._match(visitor, lam(val): raise("No visitor field for " + self.label()) end)

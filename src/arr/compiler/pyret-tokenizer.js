@@ -120,7 +120,6 @@
     {name: "ITER", val: "iter"},
     {name: "FROM", val: "from"},
     {name: "IN", val: "in"},
-    {name: "BREAK", val: "break"},
     {name: "FUN", val: "fun"},
     {name: "HIDING", val: "hiding"},
     {name: "IF", val: "if"},
