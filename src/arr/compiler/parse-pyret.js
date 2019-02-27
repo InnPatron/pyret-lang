@@ -1558,11 +1558,6 @@
           // (iter-env-update: name RIGHTTHINARROW e)
           return RUNTIME.getField(ast, 's-iter-env-update')
             .app(pos(node.pos), name(node.kids[0]), tr(node.kids[2]));
-        },
-        'break': function(node) {
-          // (BREAK)
-          return RUNTIME.getField(ast, 's-break-expr')
-            .app(pos(node.pos));
         }
       };
       return tr(node);
