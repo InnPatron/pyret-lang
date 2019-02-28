@@ -2411,6 +2411,22 @@ default-map-visitor = {
   ):
     s-while(l, condition.visit(self), body.visit(self), blocky)
   end,
+  method s-iter-expr(
+      self,
+      l :: Loc,
+      iterator :: IterBind,
+      env-bindings :: List<IterEnvBind>,
+      body :: Expr,
+      blocky :: Boolean
+  ):
+    s-iter-expr(l, iterator.visit(self), env-bindings.map(_.visit(self)), body.visit(self), blocky)
+  end,
+  method s-iter-bind(self, l :: Loc, bind :: Bind, value :: Expr):
+    s-iter-bind(l, bind.visit(self), value.visit(self))
+  end,
+  method s-iter-env-bind(self, l :: Loc, bind :: Bind, value :: Expr):
+    s-iter-env-bind(l, bind.visit(self), value.visit(self))
+  end,
   method s-check(self, l :: Loc, name :: Option<String>, body :: Expr, keyword-check :: Boolean):
     s-check(l, name, body.visit(self), keyword-check)
   end,
@@ -3020,6 +3036,22 @@ default-iter-visitor = {
       body :: Expr,
       blocky :: Boolean):
     condition.visit(self) and body.visit(self)
+  end,
+  method s-iter-expr(
+      self,
+      l :: Loc,
+      iterator :: IterBind,
+      env-bindings :: List<IterEnvBind>,
+      body :: Expr,
+      blocky :: Boolean
+  ):
+    iterator.visit(self) and all(_.visit(self), env-bindings) and body.visit(self)
+  end,
+  method s-iter-bind(self, l :: Loc, bind :: Bind, value :: Expr):
+    bind.visit(self) and value.visit(self)
+  end,
+  method s-iter-env-bind(self, l :: Loc, bind :: Bind, value :: Expr):
+    bind.visit(self) and value.visit(self)
   end,
   method s-check(self, l :: Loc, name :: Option<String>, body :: Expr, keyword-check :: Boolean):
     body.visit(self)
