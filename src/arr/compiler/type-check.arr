@@ -632,6 +632,7 @@ fun _checking(e :: Expr, expect-type :: Type, top-level :: Boolean, context :: C
         | s-for(l, iterator, bindings, ann, body) =>
           raise("s-for should have already been desugared")
         | s-while(l, condition, body, blocky) => raise("nyi")
+        | s-iter-expr(l, iter, env-bind, body, blocky) => raise("nyi")
         | s-check(l, name, body, keyword-check) =>
           typing-result(e, expect-type, context)
       end
@@ -970,6 +971,7 @@ fun _synthesis(e :: Expr, top-level :: Boolean, context :: Context) -> TypingRes
               typing-result(new-while, t-nothing(l), context)
             end)
         end)
+    | s-iter-expr(l, iter, env-bind, body, blocky) => raise("nyi")
     | s-check(l, name, body, keyword-check) =>
       result-type = new-existential(l, false)
       shadow context = context.add-variable(result-type)
