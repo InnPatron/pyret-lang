@@ -1295,7 +1295,7 @@ data Expr:
       iterator :: IterBind,
       env-bindings :: List<IterEnvBind>,
       body :: Expr,
-      blocky
+      blocky :: Boolean
     ) with:
     method label(self): "s-iter" end,
     method tosource(self):
