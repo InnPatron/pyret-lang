@@ -543,6 +543,9 @@ desugar-scope-visitor = A.default-map-visitor.{
     
     A.s-while(l, v-condition, v-body, blocky)
   end,
+  method s-iter-expr(self, l, iter-bind, iter-env-bind, body, blocky):
+    raise("nyi")
+  end,
   method s-cases-branch(self, l, pat-loc, name, args, body):
     v-body = body.visit(self)
     {new-binds; new-body} = for fold(acc from {empty; v-body}, b from args):
@@ -1363,6 +1366,9 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
     end,
     method s-while(self, l, condition, body, blocky):
       A.s-while(l, condition.visit(self), body.visit(self), blocky)
+    end,
+    method s-iter-expr(self, l, iter-bind, iter-env-bind, body, blocky):
+      raise("nyi")
     end,
     method s-cases-branch(self, l, pat-loc, name, args, body):
       {env; atoms} = for fold(acc from { self.env; empty }, a from args.map(_.bind)):

@@ -864,6 +864,9 @@ well-formed-visitor = A.default-iter-visitor.{
 
     condition.visit(self) and body.visit(self)
   end,
+  method s-iter-expr(self, l, iter-bind, iter-env-bind, body, blocky):
+    raise("nyi")
+  end,
   method s-frac(self, l, num, den) block:
     when den == 0:
       add-error(C.zero-fraction(l, num))
@@ -1286,6 +1289,15 @@ top-level-visitor = A.default-iter-visitor.{
   end,
   method s-while(_, l :: Loc, condition :: A.Expr, body :: A.Expr, blocky :: Boolean):
     well-formed-visitor.s-while(l, condition, body, blocky)
+  end,
+  method s-iter-expr(self, l, iter-bind, iter-env-bind, body, blocky):
+    raise("nyi")
+  end,
+  method s-iter-bind(_, l :: Loc, bind :: A.Bind, value :: A.Expr):
+    well-formed-visitor.s-iter-bind(l, bind, value)
+  end,
+  method s-iter-env-bind(_, l :: Loc, bind :: A.Bind, value :: A.Expr):
+    well-formed-visitor.s-iter-env-bind(l, bind, value)
   end,
   method s-check(_, l :: Loc, name :: Option<String>, body :: A.Expr, keyword-check :: Boolean):
     well-formed-visitor.s-check(l, name, body, keyword-check)
