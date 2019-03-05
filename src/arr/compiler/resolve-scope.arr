@@ -558,7 +558,7 @@ desugar-scope-visitor = A.default-map-visitor.{
       end
     end
 
-    A.s-iter-expr(self, l, v-iter-bind, new-binds.reverse(), new-body, blocky)
+    A.s-iter-expr(l, v-iter-bind, new-binds.reverse(), new-body, blocky)
   end,
   method s-cases-branch(self, l, pat-loc, name, args, body):
     v-body = body.visit(self)
