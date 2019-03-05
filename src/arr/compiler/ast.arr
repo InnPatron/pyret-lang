@@ -2427,6 +2427,9 @@ default-map-visitor = {
   method s-iter-env-bind(self, l :: Loc, bind :: Bind, value :: Expr):
     s-iter-env-bind(l, bind.visit(self), value.visit(self))
   end,
+  method s-iter-env-update(self, l :: Loc, name :: Name, value :: Expr):
+    s-iter-env-update(l, name.visit(self), value.visit(self))
+  end,
   method s-check(self, l :: Loc, name :: Option<String>, body :: Expr, keyword-check :: Boolean):
     s-check(l, name, body.visit(self), keyword-check)
   end,
@@ -3051,6 +3054,9 @@ default-iter-visitor = {
     bind.visit(self) and value.visit(self)
   end,
   method s-iter-env-bind(self, l :: Loc, bind :: Bind, value :: Expr):
+    bind.visit(self) and value.visit(self)
+  end,
+  method s-iter-env-update(self, l :: Loc, bind :: Name, value :: Expr):
     bind.visit(self) and value.visit(self)
   end,
   method s-check(self, l :: Loc, name :: Option<String>, body :: Expr, keyword-check :: Boolean):
