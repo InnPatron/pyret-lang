@@ -55,6 +55,7 @@ tvh = t-var(A.global-names.make-atom("H"))
 
 t-image = t-name(module-uri("builtin://image"), A.s-type-global("Image"))
 t-option = t-name(module-uri("builtin://option"), A.s-type-global("Option"))
+t-iter = t-name(module-uri("builtin://iter"), A.s-type-global("iter"))
 t-reactor = t-name(module-uri("builtin://reactors"), A.s-type-global("Reactor"))
 t-equality-result = t-name(module-uri("builtin://equality"), A.s-type-global("EqualityResult"))
 t-value-skeleton = t-name(module-uri("builtin://valueskeleton"), A.s-type-global("ValueSkeleton"))
@@ -75,6 +76,10 @@ end
 
 t-option-app = lam(param :: Type):
   t-app(t-option, [list: param])
+end
+
+t-iter-app = lam(param :: Type):
+  t-app(t-iter, [list: param])
 end
 
 t-reactor-app = lam(param :: Type):
@@ -228,6 +233,35 @@ module-const-arrays = t-module("builtin://arrays",
   SD.make-string-dict()
     .set("Array", t-big-array)
     .set("List", t-list)
+)
+
+module-const-iter = t-module("builtin://iter",
+  t-record([string-dict:
+    "Iter", t-arrow([list: t-top], t-boolean),
+    "next", t-forall([list: tva], 
+              t-arrow([list: tva],
+                t-data-refinement(t-iter-app(tva), "next")
+              )
+            )
+  ]),
+  SD.make-string-dict()
+    .set("Iter", t-data(
+        "Iter",
+        [list: tva],
+        [list:
+          t-variant("next",
+            [list: {"next"; t-pick-app(tva, t-arrow([list: t-top], t-iter-app(tva)))}],
+            [string-dict:
+              "_match", t-top,
+            ]
+          )
+        ],
+        [string-dict:
+            "_match", t-top
+        ])
+  ),
+  SD.make-string-dict()
+    .set("Iter", t-name(module-uri("builtin://iter"), A.s-type-global("iter")))
 )
 
 module-const-pick = t-module("builtin://pick",
