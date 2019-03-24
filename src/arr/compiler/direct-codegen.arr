@@ -628,6 +628,7 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       js-while = j-while(j-true, js-body)
 
       { j-id(NOTHING); cl-sing(js-while) }
+    | s-iter-expr(l, iter-bind, iter-env-binds, body, blocky) => raise("nyi")
     | else => raise("NYI (compile): " + torepr(expr))
   end
 
