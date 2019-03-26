@@ -17,7 +17,7 @@
 
     },
     "datatypes": {
-      "Option": ["data", "Option", ["a"], [["some", [["e", "tva"]]], ["none"]], {}]
+      "Option": ["data", "Option", ["a"], [["some", [["e", "tva"]], {}], ["none", {}]], {}]
     }
   }
 }
