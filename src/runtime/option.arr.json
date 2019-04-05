@@ -13,8 +13,8 @@
       "none": ["forall", ["a"], ["arrow", [], "opOfA"]]
 
     },
-    "Option": {
-
+    "aliases": {
+      "Option": ["local", "Option"]
     },
     "datatypes": {
       "Option": ["data", "Option", ["a"], [["some", [["e", "tva"]], {}], ["none", {}]], {}]
