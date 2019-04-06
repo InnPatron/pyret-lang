@@ -804,6 +804,16 @@ fun node-prelude(prog, provides, env, options) block:
 
 end
 
+fun compile-datatypes(prog :: A.Program) block:
+  datatypes = j-obj([clist:])
+  j-field("datatypes", datatypes)
+end
+
+fun compile-aliases(prog :: A.Program) block:
+  aliases = j-obj([clist:])
+  j-field("aliases", aliases)
+end
+
 fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
   {ans; stmts} = compile-expr({
     uri: provides.from-uri,
@@ -823,9 +833,12 @@ fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
 
   module-and-map = the-module.to-ugly-sourcemap(provides.from-uri, 1, 1, provides.from-uri)
 
+  local-datatypes = compile-datatypes(prog)
+  local-aliases = compile-aliases(prog)
+
   [D.string-dict:
     "requires", j-list(true, [clist:]),
-    "provides", j-obj([clist:]),
+    "provides", j-obj([clist: local-datatypes, local-aliases]),
     "nativeRequires", j-list(true, [clist:]),
     "theModule", J.j-raw-code(module-and-map.code),
     "theMap", J.j-str(module-and-map.map)
