@@ -877,12 +877,15 @@ fun serialize-datatype(name :: String, params :: List<A.Name>,
   end
   shadow serialized-variants = j-list(false, serialized-variants)
 
-  j-list(false,
+  obj-def = j-list(false,
          [clist: j-str("data"), 
                  j-str(name),
                  serialized-params,
                  serialized-variants,
                  j-obj(cl-empty)])
+
+  # "data name" : ["data", "data name", [type params], [variants]?, {methods}]
+  j-field(name, obj-def)
 end
 
 fun compile-datatypes(raw-datatypes :: SD.MutableStringDict<A.Expr>) block:
