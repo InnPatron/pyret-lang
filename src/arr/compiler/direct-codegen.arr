@@ -9,6 +9,7 @@ import file("js-ast.arr") as J
 import file("gensym.arr") as G
 import file("concat-lists.arr") as CL
 import file("type-structs.arr") as T
+import string-dict as SD
 import pathlib as P
 import sha as sha
 import string-dict as D
@@ -804,8 +805,73 @@ fun node-prelude(prog, provides, env, options) block:
 
 end
 
-fun compile-datatypes(prog :: A.Program) block:
-  datatypes = j-obj([clist:])
+fun serialize-variant(variant :: A.Variant):
+  cases(A.Variant) variant:
+    | s-variant(
+      _l :: Loc,
+      _constr-loc :: Loc,
+      name :: String,
+      members :: List<A.VariantMember>,
+      _with-members :: List<A.Member>     # TODO(alex): with-members
+    ) => raise("TODO: serialize non-singleton variants")
+
+    | s-singleton-variant(
+      _l :: Loc,
+      name :: String,
+      _with-members :: List<A.Member>     # TODO(alex): with-members
+    ) => 
+      j-list(false, [clist: j-str(name), j-obj([clist:]) ])
+  end
+
+end
+
+fun serialize-datatype(name :: String, params :: List<A.Name>, 
+                       variants :: List<A.Variant>) block:
+
+  serialized-params = for fold(serialized-list from cl-empty, p from params):
+    cl-append(serialized-list, cl-sing(j-str(p.toname())))
+  end
+  shadow serialized-params = j-list(false, serialized-params)
+
+  serialized-variants = for fold(serialized-list from cl-empty, v from variants):
+    cl-append(serialized-list, cl-sing(serialize-variant(v)))
+  end
+  shadow serialized-variants = j-list(false, serialized-variants)
+
+  j-list(false,
+         [clist: j-str("data"), 
+                 j-str(name),
+                 serialized-params,
+                 serialized-variants,
+                 j-obj(cl-empty)])
+end
+
+fun compile-datatypes(raw-datatypes :: SD.MutableStringDict<A.Expr>) block:
+
+  js-datatypes = for SD.fold-keys-now(serialized-datatypes from cl-empty,
+                                      key from raw-datatypes) block:
+
+    local-type = raw-datatypes.get-value-now(key)
+    serialized = cases(A.Expr) local-type:
+     | s-data-expr(
+        _loc :: Loc,
+        name :: String,
+        _namet :: A.Name,
+        params :: List<A.Name>, # type params
+        _mixins :: List<A.Expr>,
+        variants :: List<A.Variant>,
+        _shared-members :: List<A.Member>,
+        _check-loc :: Option<Loc>,
+        _check :: Option<A.Expr>
+      ) => serialize-datatype(name, params, variants)
+
+    | else => raise("Datatypes should only be s-data-expr")
+    end
+
+    cl-append(serialized-datatypes, cl-sing(serialized))
+  end
+
+  datatypes = j-obj(js-datatypes)
   j-field("datatypes", datatypes)
 end
 
@@ -824,6 +890,8 @@ fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
     post-env: post-env,
   }, prog.block)
 
+  post-env-datatypes = post-env.datatypes
+
   prelude = node-prelude(prog, provides, env, options)
 
   # module-body = J.j-block(global-binds + stmts + [clist: j-return(ans)])
@@ -833,7 +901,7 @@ fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
 
   module-and-map = the-module.to-ugly-sourcemap(provides.from-uri, 1, 1, provides.from-uri)
 
-  local-datatypes = compile-datatypes(prog)
+  local-datatypes = compile-datatypes(post-env.datatypes)
   local-aliases = compile-aliases(prog)
 
   [D.string-dict:
