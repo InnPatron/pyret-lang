@@ -890,6 +890,7 @@ fun serialize-datatype(name :: String, params :: List<A.Name>,
   j-field(name, obj-def)
 end
 
+# TODO(alex): Operate on type-structs instead of the AST?
 fun compile-datatypes(raw-datatypes :: SD.MutableStringDict<A.Expr>) block:
 
   js-datatypes = for SD.fold-keys-now(serialized-datatypes from cl-empty,
