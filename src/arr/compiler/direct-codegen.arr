@@ -9,6 +9,8 @@ import file("js-ast.arr") as J
 import file("gensym.arr") as G
 import file("concat-lists.arr") as CL
 import file("type-structs.arr") as T
+import file("compile-structs.arr") as CS
+import file("type-structs.arr") as TS
 import string-dict as SD
 import pathlib as P
 import sha as sha
@@ -917,9 +919,36 @@ fun compile-datatypes(raw-datatypes :: SD.MutableStringDict<A.Expr>) block:
   j-field("datatypes", datatypes)
 end
 
-fun compile-aliases(prog :: A.Program) block:
-  aliases = j-obj([clist:])
-  j-field("aliases", aliases)
+fun serialize-type(key :: String, t :: TS.Type):
+  cases(TS.Type) t:
+    | t-name(module-name :: TS.NameOrigin, id :: A.Name, _l :: Loc, _inferred :: Boolean) =>
+
+      cases(TS.NameOrigin) module-name:
+        | local => j-list(false, [clist: j-str("local"), j-str(id.toname()) ])
+
+        | else => raise("TODO(alex): Unhandled non-local type name origin")
+      end
+
+    | t-top(_l :: Loc, _inferred :: Boolean) => 
+        # TODO(alex): Is this correct?
+        # Exporting "type Option" produces t-top
+        j-list(false, [clist: j-str("local"), j-str(key) ])
+
+    | else => raise("TODO(alex): Unhandled type kind to serialize")
+  end
+end
+
+fun compile-type-aliases(provides :: CS.Provides) block:
+  aliases = provides.aliases
+
+  serialized-aliases = for SD.fold-keys(serialized from cl-empty, key from aliases):
+    value = serialize-type(key, aliases.get-value(key))
+    alias-field = j-field(key, value)
+
+    cl-append(serialized, cl-sing(alias-field))
+  end
+
+  j-field("aliases", j-obj(serialized-aliases) )
 end
 
 fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
@@ -944,7 +973,7 @@ fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
   module-and-map = the-module.to-ugly-sourcemap(provides.from-uri, 1, 1, provides.from-uri)
 
   local-datatypes = compile-datatypes(post-env.datatypes)
-  local-aliases = compile-aliases(prog)
+  local-aliases = compile-type-aliases(provides)
 
   [D.string-dict:
     "requires", j-list(true, [clist:]),
