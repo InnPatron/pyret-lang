@@ -805,6 +805,36 @@ fun node-prelude(prog, provides, env, options) block:
 
 end
 
+fun serialize-ann(ann :: A.Ann):
+  cases(A.Ann) ann:
+    | a-type-var(_l :: Loc, id :: A.Name) => 
+      j-list(false,
+             [clist: j-str("tid"), j-str(id.toname()) ])
+
+    | else => raise("Unsupported annotation:" + ann.label())
+  end
+end
+
+fun serialize-member-bind(bind :: A.Bind):
+
+  cases(A.Bind) bind:
+    | s-bind(l :: Loc, shadows :: Boolean, id :: A.Name, ann :: A.Ann) =>
+      j-list(false, [clist: j-str(id.toname()), serialize-ann(ann) ])
+
+    | else => raise("Unsupported member bind")
+
+  end
+end
+
+fun serialize-variant-member(member :: A.VariantMember) block:
+  cases(A.VariantMemberType) member.member-type:
+    | s-normal => nothing
+    | s-mutable => raise("Mutable variant members not supported")
+  end
+
+  serialize-member-bind(member.bind)
+end
+
 fun serialize-variant(variant :: A.Variant):
   cases(A.Variant) variant:
     | s-variant(
@@ -813,7 +843,16 @@ fun serialize-variant(variant :: A.Variant):
       name :: String,
       members :: List<A.VariantMember>,
       _with-members :: List<A.Member>     # TODO(alex): with-members
-    ) => raise("TODO: serialize non-singleton variants")
+    ) =>
+      serialized-variant-members = for fold(serialized from cl-empty, v from members):
+        cl-append(serialized, cl-sing(serialize-variant-member(v)))
+      end 
+      shadow serialized-variant-members = j-list(false, serialized-variant-members)
+      j-list(false,
+             [clist: j-str(name), 
+                     serialized-variant-members, 
+                     j-obj([clist:]) 
+             ])
 
     | s-singleton-variant(
       _l :: Loc,
