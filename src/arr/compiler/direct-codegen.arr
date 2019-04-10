@@ -831,9 +831,9 @@ fun serialize-ann(ann :: A.Ann):
       shadow serialized-args = j-list(false, serialized-args)
 
       j-list(false,
-             [clist: j-str("forall"),
-                     serialized-args,
-                     serialize-ann(ann) ])
+             [clist: j-str("tyapp"),
+                     serialize-ann(ann),
+                     serialized-args,])
 
     | a-name(_l :: Loc, id :: A.Name) =>
       # TODO(alex): Serialize a-name
