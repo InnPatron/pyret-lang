@@ -835,6 +835,8 @@ fun serialize-ann(ann :: A.Ann):
                      serialize-ann(ann),
                      serialized-args,])
 
+    | a-blank => j-list(false, [clist:])    # TODO(alex): Is this right
+
     | a-name(_l :: Loc, id :: A.Name) =>
       # TODO(alex): Serialize a-name
       j-list(false,
