@@ -817,6 +817,8 @@ fun serialize-ann(ann :: A.Ann):
       serialized-args = for fold(serialized from cl-empty, a from args):
         cl-append(serialized, cl-sing(serialize-ann(a)))
       end
+      shadow serialized-args = j-list(false, serialized-args)
+
       j-list(false,
              [clist: j-str("arrow"),
                      serialized-args,
@@ -826,6 +828,7 @@ fun serialize-ann(ann :: A.Ann):
       serialized-args = for fold(serialized from cl-empty, a from args):
         cl-append(serialized, cl-sing(serialize-ann(a)))
       end
+      shadow serialized-args = j-list(false, serialized-args)
 
       j-list(false,
              [clist: j-str("forall"),
