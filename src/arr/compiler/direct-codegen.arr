@@ -832,6 +832,12 @@ fun serialize-ann(ann :: A.Ann):
                      serialized-args,
                      serialize-ann(ann) ])
 
+    | a-name(_l :: Loc, id :: A.Name) =>
+      # TODO(alex): Serialize a-name
+      j-list(false,
+             [clist: j-str("local"),
+                     j-str(id.toname()) ])
+
     | else => raise("Unsupported annotation:" + ann.label())
   end
 end
