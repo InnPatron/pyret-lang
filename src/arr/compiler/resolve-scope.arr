@@ -1388,7 +1388,7 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
             C.value-bind(C.bo-local(iter-bind-l, bind.id), C.vb-let, _, bind.ann.visit(self)))
           new-bind = A.s-bind(bind.l, bind.shadows, atom-env.atom, bind.ann.visit(self))
           visit-val = val.visit(self)
-          new-fb = A.s-for-bind(iter-bind-l, new-bind, visit-val)
+          new-fb = A.s-iter-bind(iter-bind-l, new-bind, visit-val)
           { atom-env.env; new-fb }
       end
 
