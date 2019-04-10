@@ -640,7 +640,36 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       js-while = j-while(j-true, js-body)
 
       { j-id(NOTHING); cl-sing(js-while) }
-    | s-iter-expr(l, iter-bind, iter-env-binds, body, blocky) => raise("nyi")
+    | s-iter-expr(l, iter-bind, iter-env-binds, body, blocky) =>
+      iter-holder = fresh-id("iterator")                  # type Iter<T>
+      next-holder = fresh-id("next")                      # type Pick<T, Iter<T>>
+      iterator-var = j-var(iter-holder, iter-bind.value)
+      next-call = j-app(j-field("i", j-id(iter-holder)), cl-empty)
+      next-var = j-var(next-holder, next-call)
+      
+      # TODO(alex): emit iter-env-binds
+
+      { user-ans; user-body } = compile-expr(context, body)
+      shadow user-ans = j-expr(user-ans)
+
+      iter-bind-loop-body = cl-append(
+        cl-sing(j-var(iter-bind.name, j-dot(next-holder, "elt"))),
+        user-body
+      )
+
+      loop-body = cl-append(iter-bind-loop-body, [clist:
+        user-ans,
+        j-assign(iter-holder, j-dot(next-holder, "rest")),
+        j-assign(next-holder, next-call) 
+      ])
+      shadow loop-body = j-block(loop-body)
+
+      iter-loop-condition = j-binop(j-dot(next-holder, "$tag"), j-eq, 0)
+
+      iter-loop = j-while(iter-loop-condition, loop-body)
+
+
+      { j-id(NOTHING); [clist: iterator-var, next-var, iter-loop] }
     | else => raise("NYI (compile): " + torepr(expr))
   end
 
