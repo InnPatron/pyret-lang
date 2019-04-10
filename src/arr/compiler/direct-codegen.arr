@@ -79,6 +79,14 @@ j-while = J.j-while
 j-for = J.j-for
 j-raw-code = J.j-raw-code
 
+fun get-tag-and-variant(datatype, name) block:
+  val-and-tag = for find-index(v from datatype.variants):
+    v.name == name
+  end
+  when(is-none(val-and-tag)): raise("No such variant: " + name) end
+  val-and-tag.value
+end
+
 fun find-index<a>(f :: (a -> Boolean), lst :: List<a>) -> Option<{a; Number}> block:
   doc: ```Returns value and its index or -1 depending on if element is found```
   var i = 0
@@ -445,16 +453,8 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
         | else => raise("Can only do cases on a known datatype annotation, not on " + to-repr(typ))
       end
 
-      fun get-tag-and-variant(name) block:
-        val-and-tag = for find-index(v from datatype.variants):
-          v.name == name
-        end
-        when(is-none(val-and-tag)): raise("No such variant: " + name) end
-        val-and-tag.value
-      end
-
       switch-blocks = for CL.map_list(b from branches):
-        {variant; tag} = get-tag-and-variant(b.name)
+        {variant; tag} = get-tag-and-variant(datatype, b.name)
         cases(A.CasesBranch) b:
           | s-cases-branch(_, pl, name, args, body) =>
             {body-val; body-stmts} = compile-expr(context, body)
