@@ -821,7 +821,16 @@ fun serialize-ann(ann :: A.Ann):
              [clist: j-str("arrow"),
                      serialized-args,
                      serialize-ann(ret) ])
-           
+
+    | a-app(_l :: Loc, shadow ann :: A.Ann, args :: List<A.Ann>) =>
+      serialized-args = for fold(serialized from cl-empty, a from args):
+        cl-append(serialized, cl-sing(serialize-ann(a)))
+      end
+
+      j-list(false,
+             [clist: j-str("forall"),
+                     serialized-args,
+                     serialize-ann(ann) ])
 
     | else => raise("Unsupported annotation:" + ann.label())
   end
