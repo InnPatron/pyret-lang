@@ -656,14 +656,14 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       shadow user-ans = j-expr(user-ans)
 
       iter-bind-loop-body = cl-append(
-        cl-sing(j-var(iter-bind.bind.id, j-dot(j-id(next-holder), "elt"))),
+        cl-sing(j-var(js-id-of(iter-bind.bind.id), j-dot(j-id(next-holder), "elt"))),
         user-body
       )
 
       loop-body = cl-append(iter-bind-loop-body, [clist:
         user-ans,
-        j-assign(iter-holder, j-dot(j-id(next-holder), "rest")),
-        j-assign(next-holder, next-call) 
+        j-expr(j-assign(iter-holder, j-dot(j-id(next-holder), "rest"))),
+        j-expr(j-assign(next-holder, next-call)),
       ])
       shadow loop-body = j-block(loop-body)
 
