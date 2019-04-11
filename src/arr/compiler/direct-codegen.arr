@@ -655,14 +655,27 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       iterator-var = j-var(iter-holder, iter-value)
       next-call = j-app(j-dot(j-id(iter-holder), "i"), cl-empty)
       next-var = j-var(next-holder, next-call)
+
+      js-iter-env-binds = for fold(converted from cl-empty, ie-bind from iter-env-binds):
+        { initial-value; initial-stmts } = compile-expr(ie-bind.value)
+        
+        bind-var = j-var(js-id-of(ie-bind.bind.id), initial-value)
+
+        cl-append(converted, cl-append(initial-stmts, cl-sing(bind-var)))
+      end
       
       # TODO(alex): emit iter-env-binds
 
       { user-ans; user-body } = compile-expr(context, body)
       shadow user-ans = j-expr(user-ans)
 
-      iter-bind-loop-body = cl-append(
+      js-iter-binds = cl-append(
         cl-sing(j-var(js-id-of(iter-bind.bind.id), j-dot(j-id(next-holder), "elt"))),
+        js-iter-env-binds
+      )
+
+      iter-bind-loop-body = cl-append(
+        js-iter-binds,
         user-body
       )
 
