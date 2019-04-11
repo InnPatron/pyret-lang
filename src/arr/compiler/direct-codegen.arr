@@ -651,7 +651,7 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       next-var = j-var(next-holder, next-call)
 
       js-iter-env-binds = for fold(converted from cl-empty, ie-bind from iter-env-binds):
-        { initial-value; initial-stmts } = compile-expr(ie-bind.value)
+        { initial-value; initial-stmts } = compile-expr(context, ie-bind.value)
         
         bind-var = j-var(js-id-of(ie-bind.bind.id), initial-value)
 
