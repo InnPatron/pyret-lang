@@ -687,6 +687,15 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
 
       total-stmts = cl-append(iter-stmts, [clist: iterator-var, next-var, iter-loop])
       { j-id(NOTHING); total-stmts }
+
+    | s-iter-env-update(_, id, value) =>
+      { ie-new-val; ie-stmts } = compile-expr(context, value)
+
+      updater = j-expr(j-assign(js-id-of(id), ie-new-val))
+
+      # TODO(alex): return nothing or the updated value?
+      { j-id(NOTHING); cl-append(ie-stmts, cl-sing(updater)) }
+
     | else => raise("NYI (compile): " + torepr(expr))
   end
 
