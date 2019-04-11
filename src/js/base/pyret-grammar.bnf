@@ -79,7 +79,7 @@ iter-expr: ITER iter-bind [COMMA iter-env-bind (COMMA iter-env-bind)*] (BLOCK|CO
 
 iter-bind: binding IN binop-expr
 iter-env-bind: binding FROM binop-expr
-iter-env-update: NAME RIGHTTHINARROW binop-expr
+iter-env-update: NAME LEFTTHINARROW binop-expr
 
 tuple-binding: LBRACE (binding SEMI)* binding [SEMI] RBRACE [AS name-binding]
 name-binding: [SHADOW] NAME [COLONCOLON ann]

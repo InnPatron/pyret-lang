@@ -264,7 +264,7 @@
     {name: "PERCENT", val: "%"},
     {name: "COMMA", val: ",", parenIsForExp: true},
     {name: "THINARROW", val: "->"},
-    {name: "RIGHTTHINARROW", val: "<-"},
+    {name: "LEFTTHINARROW", val: "<-"},
     {name: "COLONEQUALS", val: ":=", parenIsForExp: true},
     {name: "COLON", val: ":", parenIsForExp: true},
     {name: "BAR", val: "|", parenIsForExp: true},
