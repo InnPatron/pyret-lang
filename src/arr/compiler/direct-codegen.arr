@@ -32,6 +32,7 @@ j-id = J.j-id
 j-method = J.j-method
 j-block = J.j-block
 j-block1 = J.j-block1
+j-bool = J.j-bool
 j-true = J.j-true
 j-false = J.j-false
 j-num = J.j-num
@@ -839,179 +840,170 @@ fun node-prelude(prog, provides, env, options) block:
 
 end
 
-fun serialize-ann(ann :: A.Ann):
-  cases(A.Ann) ann:
-    | a-type-var(_l :: Loc, id :: A.Name) => 
-      j-list(false,
-             [clist: j-str("tid"), j-str(id.toname()) ])
 
-    | a-arrow(_l :: Loc, args :: List<A.Ann>, ret :: A.Ann, _use-parens :: Boolean) =>
-      serialized-args = for fold(serialized from cl-empty, a from args):
-        cl-append(serialized, cl-sing(serialize-ann(a)))
+fun srcloc-to-raw(l):
+  cases(SL.Srcloc) l:
+    | builtin(uri) => j-list(true, [clist: j-str(uri)])
+    | srcloc(uri, sl, sc, si, el, ec, ei) =>
+      j-list(true, [clist: j-str(uri), j-num(sl), j-num(sc), j-num(si), j-num(el), j-num(ec), j-num(ei)])
+  end
+end
+
+fun cl-map-sd(f, sd):
+  for D.fold-keys(acc from cl-empty, key from sd):
+    cl-cons(f(key), acc)
+  end
+end
+
+fun compile-origin(bo):
+  j-obj([clist:
+    j-field("local-bind-site", srcloc-to-raw(bo.local-bind-site)),
+    j-field("definition-bind-site", srcloc-to-raw(bo.definition-bind-site)),
+    j-field("new-definition", j-bool(bo.new-definition)),
+    j-field("uri-of-definition", j-str(bo.uri-of-definition))
+  ])
+end
+
+fun compile-type-member(name, typ):
+  j-field(name, compile-provided-type(typ))
+end
+
+fun compile-type-variant(variant):
+  cases(T.TypeVariant) variant:
+    | t-variant(name, members, with-members, l) =>
+      compiled-members = j-list(false, CL.map_list(lam({mem-name; typ}):
+          if T.is-t-ref(typ):
+            j-list(true, [clist: j-str("ref"), j-str(mem-name), compile-provided-type(typ.typ)])
+          else:
+            j-list(true, [clist: j-str(mem-name), compile-provided-type(typ)])
+          end
+        end, members))
+      compiled-with-members = j-obj(for cl-map-sd(mem-name from with-members):
+            compile-type-member(mem-name, with-members.get-value(mem-name))
+          end)
+      j-list(true, [clist: j-str(name), compiled-members, compiled-with-members])
+    | t-singleton-variant(name, with-members, l) =>
+      compiled-with-members = j-obj(for cl-map-sd(mem-name from with-members):
+          compile-type-member(mem-name, with-members.get-value(mem-name))
+        end)
+      j-list(true, [clist: j-str(name), compiled-with-members])
+  end
+end
+
+
+fun compile-provided-data(typ :: T.DataType):
+  cases(T.DataType) typ:
+    | t-data(name, params, variants, members, l) =>
+      j-list(false,
+        [clist: j-str("data"), j-str(name),
+          j-list(false, for CL.map_list(p from params):
+              j-str(p.id.key())
+            end),
+          j-list(false, CL.map_list(compile-type-variant, variants)),
+          j-obj(for cl-map-sd(mem-name from members):
+            compile-type-member(mem-name, members.get-value(mem-name))
+          end)])
+  end
+end
+
+fun compile-provided-type(typ):
+  cases(T.Type) typ:
+    | t-name(mod-name, id, l, _) =>
+      cases(T.NameOrigin) mod-name:
+        | local => j-obj([clist:
+              j-field("tag", j-str("name")),
+              j-field("origin", j-obj([clist: j-field("import-type", j-str("$ELF"))])),
+              j-field("name", j-str(id.toname()))]) # TODO: toname or key?
+        | module-uri(uri) =>
+          j-obj([clist:
+              j-field("tag", j-str("name")),
+              j-field("origin", j-obj([clist: j-field("import-type", j-str("uri")), j-field("uri", j-str(uri))])),
+              j-field("name", j-str(id.toname()))]) # TODO: toname or key?
+        | dependency(dep) =>
+          raise("Dependency-origin names in provided-types shouldn't be possible")
       end
-      shadow serialized-args = j-list(false, serialized-args)
-
+    | t-var(name, l, _) => j-list(true, [clist: j-str("tid"), j-str(name.key())]) # NOTE(joe): changed to .key()
+    | t-arrow(args, ret, l, _) =>
+      j-list(true,
+        [clist: j-str("arrow"),
+          j-list(true, CL.map_list(compile-provided-type, args)), compile-provided-type(ret)])
+    | t-app(base, args, l, _) =>
       j-list(false,
-             [clist: j-str("arrow"),
-                     serialized-args,
-                     serialize-ann(ret) ])
+        [clist: j-str("tyapp"), compile-provided-type(base),
+          j-list(true, CL.map_list(compile-provided-type, args))])
+    | t-top(_, _) => j-str("tany")
+    | t-bot(_) => j-str("tbot")
+    | t-record(fields, l, _) =>
+      j-list(false,
+        [clist: j-str("record"), j-obj(for cl-map-sd(key from fields):
+              compile-type-member(key, fields.get-value(key))
+            end)])
+    | t-tuple(elts, l, _) =>
+      j-list(false,
+        [clist: j-str("tuple"), j-list(false, CL.map_list(compile-provided-type, elts))])
+    | t-forall(params, body, l, _) =>
+      j-list(true,
+        [clist: j-str("forall"),
+          j-list(false, for CL.map_list(p from params):
+            j-str(p.id.key())
+          end), compile-provided-type(body)])
+      # | t-ref(_, _) =>
+      # | t-existential(_, _) =>
+    | t-data-refinement(base-typ, variant-name, l, _) =>
+      j-list(true,
+        [clist: j-str("data%"), compile-provided-type(base-typ), j-str(variant-name)])
+    | else => j-ternary(j-false, j-str(tostring(typ)), j-str("tany"))
+  end
+end
 
-    | a-app(_l :: Loc, shadow ann :: A.Ann, args :: List<A.Ann>) =>
-      serialized-args = for fold(serialized from cl-empty, a from args):
-        cl-append(serialized, cl-sing(serialize-ann(a)))
+fun compile-provides(provides):
+  cases(CS.Provides) provides:
+    | provides(thismod-uri, modules, values, aliases, data-defs) =>
+      module-fields = for cl-map-sd(m from modules):
+        j-field(m, j-obj([clist: j-field("uri", j-str(modules.get-value(m)))]))
       end
-      shadow serialized-args = j-list(false, serialized-args)
-
-      j-list(false,
-             [clist: j-str("tyapp"),
-                     serialize-ann(ann),
-                     serialized-args,])
-
-    | a-blank => j-list(false, [clist:])    # TODO(alex): Is this right
-
-    | a-name(_l :: Loc, id :: A.Name) =>
-      # TODO(alex): Serialize a-name
-      j-list(false,
-             [clist: j-str("local"),
-                     j-str(id.toname()) ])
-
-    | else => raise("Unsupported annotation:" + ann.label())
-  end
-end
-
-fun serialize-member-bind(bind :: A.Bind):
-
-  cases(A.Bind) bind:
-    | s-bind(l :: Loc, shadows :: Boolean, id :: A.Name, ann :: A.Ann) =>
-      j-list(false, [clist: j-str(id.toname()), serialize-ann(ann) ])
-
-    | else => raise("Unsupported member bind")
-
-  end
-end
-
-fun serialize-variant-member(member :: A.VariantMember) block:
-  cases(A.VariantMemberType) member.member-type:
-    | s-normal => nothing
-    | s-mutable => raise("Mutable variant members not supported")
-  end
-
-  serialize-member-bind(member.bind)
-end
-
-fun serialize-variant(variant :: A.Variant):
-  cases(A.Variant) variant:
-    | s-variant(
-      _l :: Loc,
-      _constr-loc :: Loc,
-      name :: String,
-      members :: List<A.VariantMember>,
-      _with-members :: List<A.Member>     # TODO(alex): with-members
-    ) =>
-      serialized-variant-members = for fold(serialized from cl-empty, v from members):
-        cl-append(serialized, cl-sing(serialize-variant-member(v)))
-      end 
-      shadow serialized-variant-members = j-list(false, serialized-variant-members)
-      j-list(false,
-             [clist: j-str(name), 
-                     serialized-variant-members, 
-                     j-obj([clist:]) 
-             ])
-
-    | s-singleton-variant(
-      _l :: Loc,
-      name :: String,
-      _with-members :: List<A.Member>     # TODO(alex): with-members
-    ) => 
-      j-list(false, [clist: j-str(name), j-obj([clist:]) ])
-  end
-
-end
-
-fun serialize-datatype(name :: String, params :: List<A.Name>, 
-                       variants :: List<A.Variant>) block:
-
-  serialized-params = for fold(serialized-list from cl-empty, p from params):
-    cl-append(serialized-list, cl-sing(j-str(p.toname())))
-  end
-  shadow serialized-params = j-list(false, serialized-params)
-
-  serialized-variants = for fold(serialized-list from cl-empty, v from variants):
-    cl-append(serialized-list, cl-sing(serialize-variant(v)))
-  end
-  shadow serialized-variants = j-list(false, serialized-variants)
-
-  obj-def = j-list(false,
-         [clist: j-str("data"), 
-                 j-str(name),
-                 serialized-params,
-                 serialized-variants,
-                 j-obj(cl-empty)])
-
-  # "data name" : ["data", "data name", [type params], [variants]?, {methods}]
-  j-field(name, obj-def)
-end
-
-# TODO(alex): Operate on type-structs instead of the AST?
-fun compile-datatypes(raw-datatypes :: SD.MutableStringDict<A.Expr>) block:
-
-  js-datatypes = for SD.fold-keys-now(serialized-datatypes from cl-empty,
-                                      key from raw-datatypes) block:
-
-    local-type = raw-datatypes.get-value-now(key)
-    serialized = cases(A.Expr) local-type:
-     | s-data-expr(
-        _loc :: Loc,
-        name :: String,
-        _namet :: A.Name,
-        params :: List<A.Name>, # type params
-        _mixins :: List<A.Expr>,
-        variants :: List<A.Variant>,
-        _shared-members :: List<A.Member>,
-        _check-loc :: Option<Loc>,
-        _check :: Option<A.Expr>
-      ) => serialize-datatype(name, params, variants)
-
-    | else => raise("Datatypes should only be s-data-expr")
-    end
-
-    cl-append(serialized-datatypes, cl-sing(serialized))
-  end
-
-  datatypes = j-obj(js-datatypes)
-  j-field("datatypes", datatypes)
-end
-
-fun serialize-type(key :: String, t :: TS.Type):
-  cases(TS.Type) t:
-    | t-name(module-name :: TS.NameOrigin, id :: A.Name, _l :: Loc, _inferred :: Boolean) =>
-
-      cases(TS.NameOrigin) module-name:
-        | local => j-list(false, [clist: j-str("local"), j-str(id.toname()) ])
-
-        | else => raise("TODO(alex): Unhandled non-local type name origin")
+      value-fields = for cl-map-sd(v from values):
+        cases(CS.ValueExport) values.get-value(v):
+          | v-alias(origin, name) =>
+            j-field(v, j-obj([clist:
+              j-field("bind", j-str("alias")),
+              j-field("origin", compile-origin(origin)),
+              j-field("original-name", j-str(name)),
+              j-field("typ", j-false)
+            ]))
+          | v-just-type(origin, t) => j-field(v, j-obj([clist:
+              j-field("bind", j-str("let")),
+              j-field("origin", compile-origin(origin)),
+              j-field("typ", compile-provided-type(t))
+            ]))
+          | v-var(origin, t) => j-field(v, j-obj([clist:
+              j-field("bind", j-str("var")),
+              j-field("origin", compile-origin(origin)),
+              j-field("typ", compile-provided-type(t))
+            ]))
+          | v-fun(origin, t, name, flatness) =>
+            j-field(v, j-obj([clist:
+              j-field("bind", j-str("fun")),
+              j-field("origin", compile-origin(origin)),
+              j-field("flatness", flatness.and-then(j-num).or-else(j-false)),
+              j-field("name", j-str(name)),
+              j-field("typ", compile-provided-type(t))
+            ]))
+        end
       end
-
-    | t-top(_l :: Loc, _inferred :: Boolean) => 
-        # TODO(alex): Is this correct?
-        # Exporting "type Option" produces t-top
-        j-list(false, [clist: j-str("local"), j-str(key) ])
-
-    | else => raise("TODO(alex): Unhandled type kind to serialize")
+      data-fields = for cl-map-sd(d from data-defs):
+        j-field(d, compile-provided-data(data-defs.get-value(d)))
+      end
+      alias-fields = for cl-map-sd(a from aliases):
+        j-field(a, compile-provided-type(aliases.get-value(a)))
+      end
+      j-obj([clist:
+          j-field("modules", j-obj(module-fields)),
+          j-field("values", j-obj(value-fields)),
+          j-field("datatypes", j-obj(data-fields)),
+          j-field("aliases", j-obj(alias-fields))
+        ])
   end
-end
-
-fun compile-type-aliases(provides :: CS.Provides) block:
-  aliases = provides.aliases
-
-  serialized-aliases = for SD.fold-keys(serialized from cl-empty, key from aliases):
-    value = serialize-type(key, aliases.get-value(key))
-    alias-field = j-field(key, value)
-
-    cl-append(serialized, cl-sing(alias-field))
-  end
-
-  j-field("aliases", j-obj(serialized-aliases) )
 end
 
 fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
@@ -1035,12 +1027,11 @@ fun compile-program(prog :: A.Program, env, post-env, provides, options) block:
 
   module-and-map = the-module.to-ugly-sourcemap(provides.from-uri, 1, 1, provides.from-uri)
 
-  local-datatypes = compile-datatypes(post-env.datatypes)
-  local-aliases = compile-type-aliases(provides)
+  serialized-provides = compile-provides(provides)
 
   [D.string-dict:
     "requires", j-list(true, [clist:]),
-    "provides", j-obj([clist: local-datatypes, local-aliases]),
+    "provides", serialized-provides,
     "nativeRequires", j-list(true, [clist:]),
     "theModule", J.j-raw-code(module-and-map.code),
     "theMap", J.j-str(module-and-map.map)
