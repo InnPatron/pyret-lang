@@ -865,13 +865,13 @@ well-formed-visitor = A.default-iter-visitor.{
     condition.visit(self) and body.visit(self)
   end,
   method s-iter-expr(self, l, iter-bind, iter-env-binds, body, blocky) block:
-    when not(blocky):
-      wf-blocky-blocks(l, [list: body])
-    end
   
     # TODO(alex): Bug where if the body is empty, parent-block-loc maybe equal to 'nothing'
     # Applies to empty s-for blocks as well
     iter-bind.visit(self) and lists.all(_.visit(self), iter-env-binds) and body.visit(self)
+  end,
+  method s-iter-env-update(self, l, id, value) block:
+    value.visit(self)
   end,
   method s-frac(self, l, num, den) block:
     when den == 0:
@@ -1298,6 +1298,9 @@ top-level-visitor = A.default-iter-visitor.{
   end,
   method s-iter-expr(self, l, iter-bind, iter-env-binds, body, blocky):
     well-formed-visitor.s-iter-expr(l, iter-bind, iter-env-binds, body, blocky)
+  end,
+  method s-iter-env-update(_, l :: Loc, id :: A.Name, value :: A.Expr):
+    well-formed-visitor.s-iter-env-update(l, id, value)
   end,
   method s-iter-bind(_, l :: Loc, bind :: A.Bind, value :: A.Expr):
     well-formed-visitor.s-iter-bind(l, bind, value)
