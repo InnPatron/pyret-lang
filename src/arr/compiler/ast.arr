@@ -1842,6 +1842,8 @@ data Ann:
   | a-checked(checked :: Ann, residual :: Ann) with:
     method label(self): "a-checked" end,
     method tosource(self): self.residual.tosource() end
+  | a-modref(uri :: String, name :: String) with:
+    method label(self): "a-modref" end,
 sharing:
   method visit(self, visitor):
     self._match(visitor, lam(val): raise("No visitor field for " + self.label()) end)
