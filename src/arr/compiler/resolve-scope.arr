@@ -551,7 +551,7 @@ desugar-scope-visitor = A.default-map-visitor.{
       {new-binds; new-body} = acc
       lbs = simplify-let-bind(A.s-let-bind, b.l, b.bind.visit(self), b.value.visit(self), empty).reverse()
       arg-bind = lbs.first
-      shadow new-binds = A.s-for-bind(b.l, arg-bind.b, arg-bind.value) ^ link(_, new-binds)
+      shadow new-binds = A.s-iter-env-bind(b.l, arg-bind.b, arg-bind.value) ^ link(_, new-binds)
       cases(List) lbs.rest:
         | empty => {new-binds; new-body}
         | link(_, _) => {new-binds; A.s-let-expr(b.l, lbs.rest, new-body, false)}
@@ -1400,7 +1400,7 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
               C.value-bind(C.bo-local(l2, bind.id), C.vb-let, _, bind.ann.visit(self)))
             new-bind = A.s-bind(bind.l, bind.shadows, atom-env.atom, bind.ann.visit(self.{env: env}))
             visit-val = val.visit(self)
-            new-fb = A.s-for-bind(l2, new-bind, visit-val)
+            new-fb = A.s-iter-bind(l2, new-bind, visit-val)
             { atom-env.env; link(new-fb, fbs) }
         end
       end
