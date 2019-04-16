@@ -12,6 +12,8 @@ import pathlib as P
 import sha as sha
 import string-dict as D
 
+type Loc = SL.Srcloc
+
 flat-prim-app = A.prim-app-info-c(false)
 
 type CList = CL.ConcatList
@@ -75,6 +77,37 @@ j-while = J.j-while
 j-for = J.j-for
 j-raw-code = J.j-raw-code
 
+fun desugar-s-iter(l :: Loc, iterator :: A.IterBind, env-bindings :: List<A.IterEnvBind>, 
+                   body :: A.Expr, blocky :: Boolean):
+  iter-field-access = A.s-dot(l, A.s-id(A.s-name("localiterator")))
+  next-updater = A.s-app(l, iter-field-access, [list:])
+  prelude = A.s-block(l, [list:
+    A.s-var(l, A.s-bind(l, true, A.s-name("localiterator"), iterator.bind.ann), iterator.value),
+    A.s-var(l, A.s-bind(l, true, A.s-name("next"), iterator.bind.ann), next-updater)
+    # TODO(alex): Add iter-env-bindings
+  ])
+  condition-expr = A.s-cases(l, 
+    A.a-modref("pick", "Pick"),
+    A.s-id(l, A.s-name("next")),
+    [list: 
+      A.s-cases-branch(l, l, "pick-some",
+        [list:
+          A.s-cases-bind(l, A.s-cases-bind-normal, A.s-bind(l, false, A.s-underscore, A.a-blank)),
+          A.s-cases-bind(l, A.s-cases-bind-normal, A.s-bind(l, false, A.s-underscore, A.a-blank))
+        ],
+        A.s-bool(l, true)),
+      A.s-singleton-cases-branch(l, l, "pick-none", A.s-bool(l, false))
+    ],
+    false)
+  while-block = A.s-block(l, [list:
+    A.s-let(l, iterator.bind, A.s-dot(l, A.s-id(l, A.s-name("next")), "elt")),
+    A.s-assign(l, A.s-name("localiterator"), A.s-dot(l, A.s-id(l, A.s-name("next")), "rest")),
+
+    body,
+  ])
+
+  A.s-while(l, condition-expr, while-block, blocky)
+end
 
 fun desugar-s-for(loc, iter :: A.Expr, bindings :: List<A.ForBind>, ann :: A.Ann, body :: A.Expr):
   # Split binds and their values
