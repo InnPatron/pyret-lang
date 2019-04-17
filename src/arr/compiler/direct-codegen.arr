@@ -646,49 +646,8 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       js-while = j-while(j-true, js-body)
 
       { j-id(NOTHING); cl-sing(js-while) }
-    | s-iter-expr(l, iter-bind, iter-env-binds, body, blocky) =>
-      iter-holder = fresh-id(compiler-name("iterator"))                  # type Iter<T>
-      next-holder = fresh-id(compiler-name("next"))                      # type Pick<T, Iter<T>>
-      
-      {iter-value; iter-stmts} = compile-expr(context, iter-bind.value)
-      iterator-var = j-var(iter-holder, iter-value)
-      next-call = j-app(j-dot(j-id(iter-holder), "i"), cl-empty)
-      next-var = j-var(next-holder, next-call)
-
-      js-iter-env-binds = for fold(converted from cl-empty, ie-bind from iter-env-binds):
-        { initial-value; initial-stmts } = compile-expr(context, ie-bind.value)
-        
-        bind-var = j-var(js-id-of(ie-bind.bind.id), initial-value)
-
-        cl-append(converted, cl-append(initial-stmts, cl-sing(bind-var)))
-      end
-      
-      # TODO(alex): emit iter-env-binds
-
-      { user-ans; user-body } = compile-expr(context, body)
-      shadow user-ans = j-expr(user-ans)
-
-
-      iter-bind-loop-body = cl-append(
-        cl-sing(j-var(js-id-of(iter-bind.bind.id), j-dot(j-id(next-holder), "elt"))),
-        user-body
-      )
-
-      loop-body = cl-append(iter-bind-loop-body, [clist:
-        user-ans,
-        j-expr(j-assign(iter-holder, j-dot(j-id(next-holder), "rest"))),
-        j-expr(j-assign(next-holder, next-call)),
-      ])
-      shadow loop-body = j-block(loop-body)
-
-      iter-loop-condition = j-binop(j-dot(j-id(next-holder), "$tag"), j-eq, j-num(0))
-
-      iter-loop = j-while(iter-loop-condition, loop-body)
-
-      iter-env-stmts = cl-append(iter-stmts, js-iter-env-binds)
-
-      total-stmts = cl-append(iter-env-stmts, [clist: iterator-var, next-var, iter-loop])
-      { j-id(NOTHING); total-stmts }
+    | s-iter-expr(l, iter-bind, iter-env-binds, body, blocky) => 
+      raise("Should already be desugared into s-while")
 
     | s-iter-env-update(_, id, value) =>
       { ie-new-val; ie-stmts } = compile-expr(context, value)
