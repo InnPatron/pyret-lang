@@ -11,6 +11,7 @@ import file("compile-structs.arr") as C
 import file("ast-util.arr") as U
 import file("gensym.arr") as G
 import file("type-structs.arr") as T
+import file("desugar-helpers.arr") as DH
 
 type ValueBind = C.ValueBind
 type TypeBind = C.TypeBind
@@ -544,21 +545,7 @@ desugar-scope-visitor = A.default-map-visitor.{
     A.s-while(l, v-condition, v-body, blocky)
   end,
   method s-iter-expr(self, l, iter-bind, iter-env-binds, body, blocky):
-    v-iter-bind = iter-bind.visit(self)
-    v-body = body.visit(self)
-
-    {new-binds; new-body} = for fold(acc from {empty; v-body}, b from iter-env-binds):
-      {new-binds; new-body} = acc
-      lbs = simplify-let-bind(A.s-let-bind, b.l, b.bind.visit(self), b.value.visit(self), empty).reverse()
-      arg-bind = lbs.first
-      shadow new-binds = A.s-iter-env-bind(b.l, arg-bind.b, arg-bind.value) ^ link(_, new-binds)
-      cases(List) lbs.rest:
-        | empty => {new-binds; new-body}
-        | link(_, _) => {new-binds; A.s-let-expr(b.l, lbs.rest, new-body, false)}
-      end
-    end
-
-    A.s-iter-expr(l, v-iter-bind, new-binds.reverse(), new-body, blocky)
+    DH.desugar-s-iter(l, iter-bind, iter-env-binds, body, blocky).visit(self)
   end,
   method s-cases-branch(self, l, pat-loc, name, args, body):
     v-body = body.visit(self)
@@ -1382,29 +1369,8 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
       A.s-while(l, condition.visit(self), body.visit(self), blocky)
     end,
     method s-iter-expr(self, l, iter-bind, iter-env-binds, body, blocky):
-      {cur-env; new-iter-bind} = cases(A.IterBind) iter-bind block:
-        | s-iter-bind(iter-bind-l, bind, val) => 
-          atom-env = make-atom-for(bind.id, bind.shadows, self.env, bindings,
-            C.value-bind(C.bo-local(iter-bind-l, bind.id), C.vb-let, _, bind.ann.visit(self)))
-          new-bind = A.s-bind(bind.l, bind.shadows, atom-env.atom, bind.ann.visit(self))
-          visit-val = val.visit(self)
-          new-fb = A.s-iter-bind(iter-bind-l, new-bind, visit-val)
-          { atom-env.env; new-fb }
-      end
-
-      {env; fbs} = for fold(acc from { cur-env; empty }, fb from iter-env-binds):
-        {env; fbs} = acc
-        cases(A.IterEnvBind) fb block:
-          | s-iter-env-bind(l2, bind, val) => 
-            atom-env = make-atom-for(bind.id, bind.shadows, env, bindings,
-              C.value-bind(C.bo-local(l2, bind.id), C.vb-let, _, bind.ann.visit(self)))
-            new-bind = A.s-bind(bind.l, bind.shadows, atom-env.atom, bind.ann.visit(self.{env: env}))
-            visit-val = val.visit(self)
-            new-fb = A.s-iter-bind(l2, new-bind, visit-val)
-            { atom-env.env; link(new-fb, fbs) }
-        end
-      end
-      A.s-iter-expr(l, new-iter-bind, fbs.reverse(), body.visit(self.{env: env}), blocky)
+      raise("NYI")
+      
     end,
 
     method s-cases-branch(self, l, pat-loc, name, args, body):
