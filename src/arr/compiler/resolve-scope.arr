@@ -1368,11 +1368,6 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
     method s-while(self, l, condition, body, blocky):
       A.s-while(l, condition.visit(self), body.visit(self), blocky)
     end,
-    method s-iter-expr(self, l, iter-bind, iter-env-binds, body, blocky):
-      raise("NYI")
-      
-    end,
-
     method s-cases-branch(self, l, pat-loc, name, args, body):
       {env; atoms} = for fold(acc from { self.env; empty }, a from args.map(_.bind)):
         {env; atoms} = acc
