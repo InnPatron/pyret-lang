@@ -452,6 +452,10 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
               dt = provides-result.data-definitions.get-value(type-original-name)
               dt
           end
+        | a-modref(uri, name) => 
+            provides-result = context.env.provides-by-uri-value(uri)
+            dt = provides-result.data-definitions.get-value(name)
+            dt
         | else => raise("Can only do cases on a known datatype annotation, not on " + to-repr(typ))
       end
 
