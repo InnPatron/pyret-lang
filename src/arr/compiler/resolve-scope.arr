@@ -1491,6 +1491,21 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
         | else => raise("Wasn't expecting a non-s-name in resolve-names for assignment: " + torepr(id))
       end
     end,
+    method s-iter-env-update(self, l, id, expr):
+      # alex: do NOT desugar into assigns to preserve well-formness info for later
+      cases(A.Name) id:
+        | s-name(l2, s) =>
+          if self.env.has-key(s):
+            bind = self.env.get-value(s)
+            A.s-assign(l, bind.atom, expr.visit(self))
+            # This used to examine bind in more detail, and raise an error if it wasn't a var-bind
+            # but that's better suited for a later pass
+          else:
+            A.s-assign(l, id, expr.visit(self))
+          end
+        | else => raise("Wasn't expecting a non-s-name in resolve-names for iter-env-update " + torepr(id))
+      end
+    end,
     method s-dot(self, l, obj, name):
       cases(A.Expr) obj:
         | s-id(l2, id) =>
@@ -1657,6 +1672,20 @@ fun check-unbound-ids-bad-assignments(ast :: A.Program, resolved :: C.NameResolu
         true
       end,
       method s-assign(self, loc, id, value) block:
+        id-k = id.key()
+        if bindings.has-key-now(id-k):
+          binding = bindings.get-value-now(id-k)
+          when not(C.is-vb-var(binding.binder)) block:
+            var-loc = get-origin-loc(binding.origin)
+            add-error(C.bad-assignment(A.s-assign(loc, id, value), var-loc))
+          end
+        else:
+          add-error(C.unbound-var(id.toname(), loc))
+        end
+        value.visit(self)
+      end,
+      method s-iter-env-update(self, loc, id, value) block:
+        # alex: do NOT desugar into assigns to preserve well-formness info for later
         id-k = id.key()
         if bindings.has-key-now(id-k):
           binding = bindings.get-value-now(id-k)
