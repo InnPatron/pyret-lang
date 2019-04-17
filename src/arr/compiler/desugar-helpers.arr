@@ -77,36 +77,38 @@ j-while = J.j-while
 j-for = J.j-for
 j-raw-code = J.j-raw-code
 
-fun desugar-s-iter(l :: Loc, iterator :: A.IterBind, env-bindings :: List<A.IterEnvBind>, 
+fun desugar-s-iter-expr(l :: Loc, iterator :: A.IterBind, env-bindings :: List<A.IterEnvBind>, 
                    body :: A.Expr, blocky :: Boolean):
-  iter-field-access = A.s-dot(l, A.s-id(A.s-name("localiterator")))
+  iter-field-access = A.s-dot(l, A.s-id(l, A.s-name(l, "localiterator")), "i")
   next-updater = A.s-app(l, iter-field-access, [list:])
-  prelude = A.s-block(l, [list:
-    A.s-var(l, A.s-bind(l, true, A.s-name("localiterator"), iterator.bind.ann), iterator.value),
-    A.s-var(l, A.s-bind(l, true, A.s-name("next"), iterator.bind.ann), next-updater)
+  prelude = [list:
+    A.s-var(l, A.s-bind(l, true, A.s-name(l, "localiterator"), iterator.bind.ann), iterator.value),
+    A.s-var(l, A.s-bind(l, true, A.s-name(l, "next"), iterator.bind.ann), next-updater)
     # TODO(alex): Add iter-env-bindings
-  ])
+  ]
   condition-expr = A.s-cases(l, 
     A.a-modref("pick", "Pick"),
-    A.s-id(l, A.s-name("next")),
+    A.s-id(l, A.s-name(l, "next")),
     [list: 
       A.s-cases-branch(l, l, "pick-some",
         [list:
-          A.s-cases-bind(l, A.s-cases-bind-normal, A.s-bind(l, false, A.s-underscore, A.a-blank)),
-          A.s-cases-bind(l, A.s-cases-bind-normal, A.s-bind(l, false, A.s-underscore, A.a-blank))
+          A.s-cases-bind(l, A.s-cases-bind-normal, A.s-bind(l, false, A.s-underscore(l), A.a-blank)),
+          A.s-cases-bind(l, A.s-cases-bind-normal, A.s-bind(l, false, A.s-underscore(l), A.a-blank))
         ],
         A.s-bool(l, true)),
       A.s-singleton-cases-branch(l, l, "pick-none", A.s-bool(l, false))
     ],
     false)
   while-block = A.s-block(l, [list:
-    A.s-let(l, iterator.bind, A.s-dot(l, A.s-id(l, A.s-name("next")), "elt")),
-    A.s-assign(l, A.s-name("localiterator"), A.s-dot(l, A.s-id(l, A.s-name("next")), "rest")),
+    A.s-let(l, iterator.bind, A.s-dot(l, A.s-id(l, A.s-name(l, "next")), "elt"), false),
+    A.s-assign(l, A.s-name(l, "localiterator"), A.s-dot(l, A.s-id(l, A.s-name(l, "next")), "rest")),
 
     body,
+
+    A.s-assign(l, A.s-name(l, "next"), A.s-app(l, iter-field-access, [list:])),
   ])
 
-  A.s-while(l, condition-expr, while-block, blocky)
+  A.s-block(l, prelude.append([list: A.s-while(l, condition-expr, while-block, blocky)] ))
 end
 
 fun desugar-s-for(loc, iter :: A.Expr, bindings :: List<A.ForBind>, ann :: A.Ann, body :: A.Expr):
