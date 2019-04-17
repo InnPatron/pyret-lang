@@ -81,11 +81,18 @@ fun desugar-s-iter-expr(l :: Loc, iterator :: A.IterBind, env-bindings :: List<A
                    body :: A.Expr, blocky :: Boolean):
   iter-field-access = A.s-dot(l, A.s-id(l, A.s-name(l, "localiterator")), "i")
   next-updater = A.s-app(l, iter-field-access, [list:])
-  prelude = [list:
+  prologue = [list:
     A.s-var(l, A.s-bind(l, true, A.s-name(l, "localiterator"), iterator.bind.ann), iterator.value),
     A.s-var(l, A.s-bind(l, true, A.s-name(l, "next"), iterator.bind.ann), next-updater)
-    # TODO(alex): Add iter-env-bindings
   ]
+
+  prologue-env-binds = for fold(p from prologue, eb from env-bindings):
+    converted-eb = 
+      A.s-var(l, eb.bind, eb.value)
+
+    p.append([list: converted-eb])
+  end
+
   condition-expr = A.s-cases(l, 
     A.a-modref("builtin://pick", "Pick"),
     A.s-id(l, A.s-name(l, "next")),
@@ -108,7 +115,7 @@ fun desugar-s-iter-expr(l :: Loc, iterator :: A.IterBind, env-bindings :: List<A
     A.s-assign(l, A.s-name(l, "next"), A.s-app(l, iter-field-access, [list:])),
   ])
 
-  A.s-block(l, prelude.append([list: A.s-while(l, condition-expr, while-block, blocky)] ))
+  A.s-block(l, prologue-env-binds.append([list: A.s-while(l, condition-expr, while-block, blocky)] ))
 end
 
 fun desugar-s-for(loc, iter :: A.Expr, bindings :: List<A.ForBind>, ann :: A.Ann, body :: A.Expr):
