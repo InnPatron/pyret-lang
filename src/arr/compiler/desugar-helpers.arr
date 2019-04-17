@@ -87,7 +87,7 @@ fun desugar-s-iter-expr(l :: Loc, iterator :: A.IterBind, env-bindings :: List<A
     # TODO(alex): Add iter-env-bindings
   ]
   condition-expr = A.s-cases(l, 
-    A.a-modref("pick", "Pick"),
+    A.a-name(l, A.s-modref("pick", "Pick")),
     A.s-id(l, A.s-name(l, "next")),
     [list: 
       A.s-cases-branch(l, l, "pick-some",
