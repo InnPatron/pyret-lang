@@ -1261,10 +1261,12 @@
           // (while-expr WHILE binop-expr (BLOCK|COLON) block END)
 
           var isBlock = (node.kids[node.kids.length - 3].name == "BLOCK");
+          var block = RUNTIME.getField(ast, 's-block')
+            .app(pos(node.pos), makeListTr(node.kids, node.kids.length - 2, node.kids.length - 1));
           return RUNTIME.getField(ast, 's-while')
             .app(pos(node.pos), 
               tr(node.kids[1]),                        // translate condition
-              tr(node.kids[node.kids.length - 2]),    // translate block
+              block,    // translate block
               isBlock);
         },
         'user-block-expr': function(node) {
