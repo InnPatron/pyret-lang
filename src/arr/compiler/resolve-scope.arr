@@ -1682,7 +1682,6 @@ fun check-unbound-ids-bad-assignments(ast :: A.Program, resolved :: C.NameResolu
         else if type-bindings.has-key-now(id.key()):
           nothing
         else:
-          raise("FOO")
           add-error(C.unbound-type-id(A.a-name(loc, id)))
           nothing
         end

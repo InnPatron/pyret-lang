@@ -153,13 +153,6 @@ data Name:
     method tosourcestring(self): self.to-compiled() end,
     method toname(self): self.base end,
     method key(self): "atom#" + self.base + "#" + tostring(self.serial) end
-  | s-modref(uri :: String, name :: String) with:
-    method to-compiled-source(self): PP.str(self.to-compiled()) end,
-    method to-compiled(self): self.uri + self.name end,
-    method tosource(self): PP.str(self.toname()) end,
-    method tosourcestring(self): self.to-compiled() end,
-    method toname(self): self.uri end,
-    method key(self): "modref#" + self.uri + "#" + self.name end
 sharing:
   method _lessthan(self, other): self.key() < other.key() end,
   method _lessequal(self, other): self.key() <= other.key() end,
@@ -1967,10 +1960,6 @@ default-map-visitor = {
     s-global(s)
   end,
 
-  method s-modref(self, uri :: String, name :: String):
-    s-modref(uri, name)
-  end,
-
   method s-atom(self, base, serial):
     s-atom(base, serial)
   end,
@@ -2607,10 +2596,6 @@ default-iter-visitor = {
   method s-atom(self, base, serial):
     true
   end,
-  method s-modref(self, uri :: String, name :: String):
-    true
-  end,
-
 
   method s-star(self, l, hidden):
     hidden.all(_.visit(self))
@@ -3239,10 +3224,6 @@ dummy-loc-visitor = {
   method s-atom(self, base, serial):
     s-atom(base, serial)
   end,
-  method s-modref(self, uri :: String, name :: String):
-    s-modref(uri, name)
-  end,
-
 
   method s-star(self, _, hidden):
     s-star(dummy-loc, hidden.map(_.visit(self)))
