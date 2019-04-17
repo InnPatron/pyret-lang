@@ -115,7 +115,29 @@ fun desugar-s-iter-expr(l :: Loc, iterator :: A.IterBind, env-bindings :: List<A
     A.s-assign(l, A.s-name(l, "next"), A.s-app(l, iter-field-access, [list:])),
   ])
 
-  A.s-block(l, prologue-env-binds.append([list: A.s-while(l, condition-expr, while-block, blocky)] ))
+  { return-iter-env; iter-env-binds} = for fold({names; field-bindings} from {empty; empty}, 
+                                               eb from env-bindings):
+    name-expr = A.s-id(l, eb.bind.id)
+
+    field = A.s-bind(l, false, eb.bind.id, eb.bind.ann)
+
+    { names.append([list: name-expr]); field-bindings.append([list: field]) }
+  end
+
+  has-iter-env = is-empty(return-iter-env)
+  shadow return-iter-env = A.s-tuple(l, return-iter-env)
+  shadow iter-env-binds = A.s-tuple-bind(l, iter-env-binds, none)
+
+  before-epilogue = prologue-env-binds.append([list: A.s-while(l, condition-expr, while-block, blocky)])
+
+  fully-desugared = if has-iter-env:
+    A.s-block(l, before-epilogue)
+  else:
+    full-block = A.s-block(l, before-epilogue.append([list: return-iter-env]))
+    A.s-let(l, iter-env-binds, full-block, false)
+  end
+
+  fully-desugared
 end
 
 fun desugar-s-for(loc, iter :: A.Expr, bindings :: List<A.ForBind>, ann :: A.Ann, body :: A.Expr):
