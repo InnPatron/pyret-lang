@@ -1842,6 +1842,8 @@ data Ann:
   | a-checked(checked :: Ann, residual :: Ann) with:
     method label(self): "a-checked" end,
     method tosource(self): self.residual.tosource() end
+  | a-modref(uri :: String, name :: String) with:
+    method label(self): "a-modref" end,
 sharing:
   method visit(self, visitor):
     self._match(visitor, lam(val): raise("No visitor field for " + self.label()) end)
@@ -2566,6 +2568,9 @@ default-map-visitor = {
   end,
   method a-field(self, l, name, ann):
     a-field(l, name, ann.visit(self))
+  end,
+  method a-modref(self, uri, name):
+    a-modref(uri, name)
   end
 }
 
@@ -3195,6 +3200,9 @@ default-iter-visitor = {
   end,
   method a-field(self, l, name, ann):
     ann.visit(self)
+  end,
+  method a-modref(self, uri, name):
+    true
   end
 }
 
@@ -3774,5 +3782,8 @@ dummy-loc-visitor = {
   end,
   method a-field(self, l, name, ann):
     a-field(dummy-loc, name, ann.visit(self))
+  end,
+  method a-modref(self, uri, name):
+    a-modref(uri, name)
   end
 }
