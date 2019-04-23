@@ -11,7 +11,6 @@ import file("compile-structs.arr") as C
 import file("ast-util.arr") as U
 import file("gensym.arr") as G
 import file("type-structs.arr") as T
-import file("desugar-helpers.arr") as DH
 
 type ValueBind = C.ValueBind
 type TypeBind = C.TypeBind
@@ -544,8 +543,33 @@ desugar-scope-visitor = A.default-map-visitor.{
     
     A.s-while(l, v-condition, v-body, blocky)
   end,
-  method s-iter-expr(self, l, iter-bind, iter-env-binds, body, blocky):
-    DH.desugar-s-iter-expr(l, iter-bind, iter-env-binds, body, blocky).visit(self)
+  method s-iter-expr(self, l, iter-bind, env-bindings, body, blocky):
+    new-iter-bind = block:
+      lbs = simplify-let-bind(A.s-let-bind, 
+                        iter-bind.l, 
+                        iter-bind.bind.visit(self),
+                        iter-bind.value.visit(self),
+                        empty)
+      env-bind = lbs.first
+      new-bind = A.s-iter-bind(iter-bind.l, env-bind.b, env-bind.value)
+      new-bind
+    end
+
+    v-body = body.visit(self)
+    {new-binds; new-body} = for fold(acc from {empty; v-body}, b from env-bindings):
+      {new-binds; new-body} = acc
+
+      lbs = simplify-let-bind(A.s-var-bind, b.l, b.bind.visit(self), b.value.visit(self), empty).reverse()
+      env-bind = lbs.first
+
+      shadow new-binds = A.s-iter-env-bind(b.l, env-bind.b, env-bind.value) ^ link(_, new-binds)
+      cases(List) lbs.rest:
+        | empty => {new-binds; new-body}
+        | link(_, _) => {new-binds; A.s-let-expr(b.l, lbs.rest, new-body, false)}
+      end
+    end
+
+    A.s-iter-expr(l, new-iter-bind, new-binds.reverse(), new-body, blocky)
   end,
   method s-cases-branch(self, l, pat-loc, name, args, body):
     v-body = body.visit(self)
@@ -1368,6 +1392,39 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
     method s-while(self, l, condition, body, blocky):
       A.s-while(l, condition.visit(self), body.visit(self), blocky)
     end,
+    method s-iter-expr(self, l, iter-bind, env-bindings, body, blocky):
+      # Add iterator binding to current environment
+      {iter-bind-env; new-iter-bind} = block:
+        abind = iter-bind.bind
+        atom-env = make-atom-for(abind.id, abind.shadows, self.env, bindings,
+          C.value-bind(C.bo-local(iter-bind.l, abind.id), C.vb-let, _, abind.ann.visit(self)))
+        new-bind = A.s-bind(abind.l, abind.shadows, atom-env.atom, abind.ann.visit(self))
+        visit-val = iter-bind.value.visit(self)
+        new-iter-bind = A.s-iter-bind(iter-bind.l, new-bind, visit-val)
+
+        { atom-env.env; new-iter-bind }
+      end
+
+      # Add iterator environment bindings to current environment
+      {env; ebs} = for fold(acc from { iter-bind-env; empty }, eb from env-bindings):
+        {env; ebs} = acc
+        cases(A.IterEnvBind) eb block:
+          | s-iter-env-bind(l2, bind, value) => 
+            atom-env = make-atom-for(bind.id, bind.shadows, env, bindings,
+              C.value-bind(C.bo-local(l2, bind.id), C.vb-var, _, bind.ann.visit(self)))
+            new-bind = A.s-bind(bind.l, bind.shadows, atom-env.atom, bind.ann.visit(self.{env: env}))
+            visit-val = value.visit(self)
+            new-eb = A.s-iter-env-bind(l2, new-bind, visit-val)
+
+            { atom-env.env; link(new-eb, ebs) }
+        end
+      end
+
+      # TODO(alex): figure out how to persist environment bindings beyond the body
+      # self.env = env
+
+      A.s-iter-expr(l, new-iter-bind, ebs.reverse(), body.visit(self.{env: env}), blocky)
+    end,
     method s-cases-branch(self, l, pat-loc, name, args, body):
       {env; atoms} = for fold(acc from { self.env; empty }, a from args.map(_.bind)):
         {env; atoms} = acc
@@ -1497,11 +1554,11 @@ fun resolve-names(p :: A.Program, initial-env :: C.CompileEnvironment):
         | s-name(l2, s) =>
           if self.env.has-key(s):
             bind = self.env.get-value(s)
-            A.s-assign(l, bind.atom, expr.visit(self))
+            A.s-iter-env-update(l, bind.atom, expr.visit(self))
             # This used to examine bind in more detail, and raise an error if it wasn't a var-bind
             # but that's better suited for a later pass
           else:
-            A.s-assign(l, id, expr.visit(self))
+            A.s-iter-env-update(l, id, expr.visit(self))
           end
         | else => raise("Wasn't expecting a non-s-name in resolve-names for iter-env-update " + torepr(id))
       end
