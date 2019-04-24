@@ -648,10 +648,12 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       { j-id(NOTHING); cl-sing(js-while) }
     
     | s-iter-expr(l, iter-bind, iter-env-binds, body, blocky) =>
-      iter-holder = fresh-id("iterator")                  # type Iter<T>
-      next-holder = fresh-id("next")                      # type Pick<T, Iter<T>>
-      iterator-var = j-var(iter-holder, iter-bind.value)
-      next-call = j-app(j-field("i", j-id(iter-holder)), cl-empty)
+      iter-holder = fresh-id(compiler-name("iterator"))                  # type Iter<T>
+      next-holder = fresh-id(compiler-name("next"))                      # type Pick<T, Iter<T>>
+      
+      {iter-value; iter-stmts} = compile-expr(context, iter-bind.value)
+      iterator-var = j-var(iter-holder, iter-value)
+      next-call = j-app(j-dot(j-id(iter-holder), "i"), cl-empty)
       next-var = j-var(next-holder, next-call)
       
       # TODO(alex): emit iter-env-binds
@@ -660,23 +662,23 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       shadow user-ans = j-expr(user-ans)
 
       iter-bind-loop-body = cl-append(
-        cl-sing(j-var(iter-bind.name, j-dot(next-holder, "elt"))),
+        cl-sing(j-var(iter-bind.bind.id, j-dot(j-id(next-holder), "elt"))),
         user-body
       )
 
       loop-body = cl-append(iter-bind-loop-body, [clist:
         user-ans,
-        j-assign(iter-holder, j-dot(next-holder, "rest")),
+        j-assign(iter-holder, j-dot(j-id(next-holder), "rest")),
         j-assign(next-holder, next-call) 
       ])
       shadow loop-body = j-block(loop-body)
 
-      iter-loop-condition = j-binop(j-dot(next-holder, "$tag"), j-eq, 0)
+      iter-loop-condition = j-binop(j-dot(j-id(next-holder), "$tag"), j-eq, j-num(0))
 
       iter-loop = j-while(iter-loop-condition, loop-body)
 
-
-      { j-id(NOTHING); [clist: iterator-var, next-var, iter-loop] }
+      total-stmts = cl-append(iter-stmts, [clist: iterator-var, next-var, iter-loop])
+      { j-id(NOTHING); total-stmts }
 
     | s-iter-env-update(_, id, value) =>
       { ie-new-val; ie-stmts } = compile-expr(context, value)
