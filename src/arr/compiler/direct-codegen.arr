@@ -669,13 +669,9 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
       { user-ans; user-body } = compile-expr(context, body)
       shadow user-ans = j-expr(user-ans)
 
-      js-iter-binds = cl-append(
-        cl-sing(j-var(js-id-of(iter-bind.bind.id), j-dot(j-id(next-holder), "elt"))),
-        js-iter-env-binds
-      )
 
       iter-bind-loop-body = cl-append(
-        js-iter-binds,
+        cl-sing(j-var(js-id-of(iter-bind.bind.id), j-dot(j-id(next-holder), "elt"))),
         user-body
       )
 
@@ -690,7 +686,10 @@ fun compile-expr(context, expr) -> { J.JExpr; CList<J.JStmt>}:
 
       iter-loop = j-while(iter-loop-condition, loop-body)
 
-      total-stmts = cl-append(iter-stmts, [clist: iterator-var, next-var, iter-loop])
+      iter-env-stmts = cl-append(iter-stmts, js-iter-env-binds)
+
+      total-stmts = cl-append(iter-env-stmts, [clist: iterator-var, next-var, iter-loop])
+
       { j-id(NOTHING); total-stmts }
 
     | s-iter-env-update(_, id, value) =>
