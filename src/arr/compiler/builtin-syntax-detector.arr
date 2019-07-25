@@ -119,6 +119,14 @@ fun check-expr(import-flags, expr :: A.Expr):
       # Because if we're taking type seriously, this can't fail! 
       check-expr(import-flags, body)
 
+    | s-data(_, _, _, mixins, _, _, _, _checks) =>
+      mixin-flags = check-list(import-flags, mixins)
+
+      cases(Option) _checks:
+        | some(checks) => check-expr(mixin-flags, checks)
+        | none => mixin-flags
+      end
+
     | s-data-expr(l, name, namet, params, mixins, variants, shared, _check-loc, _check) =>
       import-flags 
       
@@ -175,10 +183,10 @@ fun check-expr(import-flags, expr :: A.Expr):
     | s-user-block(l, body) => 
       check-expr(import-flags, body)
 
-    | s-template(l) => nyi("s-template")
+    | s-template(l) => import-flags
     | s-method(l, name, params, args, ann, doc, body, _check-loc, _check, blocky) => nyi("s-method")
-    | s-type(l, name, params, ann) => raise("s-type already removed")
-    | s-newtype(l, name, namet) => raise("s-newtype already removed")
+    | s-type(l, name, params, ann) => import-flags
+    | s-newtype(l, name, namet) => import-flags
 
     | s-when(l, test, body, blocky) =>
       fuse-flags(check-expr(import-flags, test), check-expr(import-flags, body))
@@ -243,7 +251,7 @@ fun check-expr(import-flags, expr :: A.Expr):
     | s-tuple-get(l, tup, index, index-loc) => 
       check-expr(import-flags, tup)
 
-    | s-ref(l, ann) => nyi("s-ref")
+    | s-ref(l, ann) => import-flags
 
     | s-reactor(l, fields) =>
       import-flags.{ reactor-import: true }
