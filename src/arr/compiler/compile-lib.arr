@@ -23,6 +23,7 @@ import file("desugar-post-tc.arr") as DP
 import file("type-check.arr") as T
 import file("desugar-check.arr") as CH
 import file("resolve-scope.arr") as RS
+import file("builtin-syntax-detector.arr") as BSD
 
 data CompilationPhase:
   | start(time :: Number)
@@ -200,9 +201,12 @@ end
 
 fun get-dependencies(p :: PyretCode, uri :: URI) -> List<CS.Dependency>:
   parsed = get-ast(p, uri)
-  for map(s from lists.filter-map(get-import-type, parsed.imports)):
+  deps = for map(s from lists.filter-map(get-import-type, parsed.imports)):
     AU.import-to-dep(s)
   end
+  new-deps = BSD.apply-import-flags(parsed, deps)
+  spy: new-deps end
+  new-deps
 end
 
 fun get-standard-dependencies(p :: PyretCode, uri :: URI) -> List<CS.Dependency>:
