@@ -19,7 +19,7 @@ fun default-import-flags() -> ImportFlags:
   flags(false, false, false, false)
 end
 
-fun fuse-flags(lhs :: ImportFlags, rhs :: ImportFlags) -> ImportFlags:
+fun fuse-flags(lhs, rhs) -> ImportFlags:
   flags(
     lhs.array-import or rhs.array-import,
     lhs.number-import or rhs.number-import,
@@ -54,7 +54,7 @@ fun check-seq(import-flags, exprs):
   end
 end
 
-fun check-expr(import-flags :: ImportFlags, expr :: A.Expr):
+fun check-expr(import-flags, expr :: A.Expr):
   cases(A.Expr) expr block:
     | s-module(l, answer, dms, dvs, dts, checks) =>
       ans-flags = check-expr(import-flags, answer)
@@ -287,11 +287,16 @@ fun check-expr(import-flags :: ImportFlags, expr :: A.Expr):
 end
 
 
-fun get-import-flags(prog :: A.Prog) -> ImportFlags:
-  check-expr(default-import-flags(), prog.block)
+fun get-import-flags(prog :: A.Program) -> ImportFlags:
+  result = check-expr(default-import-flags(), prog.block)
+  flags(
+    result.array-import,
+    result.number-import,
+    result.reactor-import,
+    result.table-import)
 end
 
-fun apply-import-flags(prog :: A.Prog, current-deps :: List<CS.Dependency>) -> List<CS.Dependency>:
+fun apply-import-flags(prog :: A.Program, current-deps :: List<CS.Dependency>) -> List<CS.Dependency>:
   import-flags = get-import-flags(prog)
 
   new-deps = current-deps
