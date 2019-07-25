@@ -307,13 +307,14 @@ fun apply-import-flags(prog :: A.Program, current-deps :: List<CS.Dependency>) -
   array-dep = CS.builtin("array")
 
 
-  # TODO(alex): Handle rest of import flags
   shadow new-deps = if import-flags.table-import and not(new-deps.member(table-dep)):
     new-deps.append([list: table-dep])
   else:
     new-deps
   end
 
+  # TODO(alex): Handle rest of import flags
+  #|
   shadow new-deps = if import-flags.reactor-import and not(new-deps.member(reactor-dep)):
     raise("NYI: auto reactor import")
   else:
@@ -331,6 +332,7 @@ fun apply-import-flags(prog :: A.Program, current-deps :: List<CS.Dependency>) -
   else:
     new-deps
   end
+  |#
 
   new-deps
 end
