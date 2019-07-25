@@ -141,8 +141,8 @@ fun check-expr(import-flags, expr :: A.Expr):
     | s-cases-else(l, typ, val, branches, _else, blocky) =>
       
       val-flags = check-expr(import-flags, val)
-      switch-flags = for CL.foldr(shadow flags from val-flags, b from branches):
-        cases(A.CasesBranch) b:
+      switch-flags = for fold(shadow flags from val-flags, b from branches):
+        cases(A.CasesBranch) b: 
           | s-cases-branch(_, pl, name, args, body) =>
             check-expr(flags, body)
           | s-singleton-cases-branch(_, pl, name, body) =>
