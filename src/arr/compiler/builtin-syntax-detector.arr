@@ -1,6 +1,7 @@
 provide *
 provide-types *
 
+import file("compile-structs.arr") as CS
 import file("desugar-helpers.arr") as DH
 import file("ast.arr") as A
 import file("concat-lists.arr") as CL
@@ -283,4 +284,48 @@ fun check-expr(import-flags :: ImportFlags, expr :: A.Expr):
     | else => raise("NYI (builtin syntax detector): " + torepr(expr))
   end
 
+end
+
+
+fun get-import-flags(prog :: A.Prog) -> ImportFlags:
+  check-expr(default-import-flags(), prog.block)
+end
+
+fun apply-import-flags(prog :: A.Prog, current-deps :: List<CS.Dependency>) -> List<CS.Dependency>:
+  import-flags = get-import-flags(prog)
+
+  new-deps = current-deps
+  
+  table-dep = CS.builtin("tables")
+  reactor-dep = CS.builtin("reactors")
+  number-dep = CS.builtin("number")
+  array-dep = CS.builtin("array")
+
+
+  # TODO(alex): Handle rest of import flags
+  shadow new-deps = if import-flags.table-import and not(current-deps.elt(table-dep)):
+    new-deps.append(table-dep)
+  else:
+    new-deps
+  end
+
+  shadow new-deps = if import-flags.reactor-import and not(current-deps.elt(reactor-dep)):
+    raise("NYI: auto reactor import")
+  else:
+    new-deps
+  end
+
+  shadow new-deps = if import-flags.number-import and not(current-deps.elt(number-dep)):
+    raise("NYI: auto number import")
+  else:
+    new-deps
+  end
+
+  shadow new-deps = if import-flags.array-import and not(current-deps.elt(array-dep)):
+    raise("NYI: auto array import")
+  else:
+    new-deps
+  end
+
+  new-deps
 end
