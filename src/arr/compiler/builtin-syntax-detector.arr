@@ -308,25 +308,25 @@ fun apply-import-flags(prog :: A.Program, current-deps :: List<CS.Dependency>) -
 
 
   # TODO(alex): Handle rest of import flags
-  shadow new-deps = if import-flags.table-import and not(current-deps.elt(table-dep)):
-    new-deps.append(table-dep)
+  shadow new-deps = if import-flags.table-import and not(new-deps.member(table-dep)):
+    new-deps.append([list: table-dep])
   else:
     new-deps
   end
 
-  shadow new-deps = if import-flags.reactor-import and not(current-deps.elt(reactor-dep)):
+  shadow new-deps = if import-flags.reactor-import and not(new-deps.member(reactor-dep)):
     raise("NYI: auto reactor import")
   else:
     new-deps
   end
 
-  shadow new-deps = if import-flags.number-import and not(current-deps.elt(number-dep)):
+  shadow new-deps = if import-flags.number-import and not(new-deps.member(number-dep)):
     raise("NYI: auto number import")
   else:
     new-deps
   end
 
-  shadow new-deps = if import-flags.array-import and not(current-deps.elt(array-dep)):
+  shadow new-deps = if import-flags.array-import and not(new-deps.member(array-dep)):
     raise("NYI: auto array import")
   else:
     new-deps
