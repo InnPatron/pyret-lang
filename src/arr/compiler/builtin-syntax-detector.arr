@@ -281,6 +281,22 @@ fun check-expr(import-flags, expr :: A.Expr):
       import-flags.{ table-import: true }
 
     | s-spy-block(l, message, contents) => import-flags
+
+    | s-fun(
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+        body :: A.Expr,
+        _,
+        _check :: Option<A.Expr>,
+        _
+      ) => 
+      # TODO(alex): check _check?
+      check-expr(import-flags, body)
+
     | else => raise("NYI (builtin syntax detector): " + torepr(expr))
   end
 
