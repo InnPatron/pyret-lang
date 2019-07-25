@@ -1,11 +1,18 @@
 provide *
 provide-types *
 
+import srcloc as SL
 import file("compile-structs.arr") as CS
 import file("desugar-helpers.arr") as DH
 import file("ast.arr") as A
 import file("concat-lists.arr") as CL
 
+
+type Loc = SL.Srcloc
+type Expr = A.Expr
+type Name = A.Name
+type Bind = A.Bind
+type Ann = A.Ann
 
 data ImportFlags:
   | flags(
@@ -74,8 +81,7 @@ fun check-expr(import-flags, expr :: A.Expr):
 
     | s-id(l, id) => import-flags
     | s-id-letrec(l, id, _) => import-flags
-    | s-id-modref(l, id, _, field) =>
-      fuse-flags(import-flags, check-expr(import-flags, A.s-id(l, id)))
+    | s-id-modref(l, id, _, field) => import-flags
 
     | s-prim-app(l, name, args, _) =>
       check-list(import-flags, args)
@@ -264,10 +270,15 @@ fun check-expr(import-flags, expr :: A.Expr):
     | s-paren(l, e) => 
       check-expr(import-flags, e)
 
-    | s-let(_, _, _, _) => import-flags
-    | s-var(l, name, value) => import-flags
-    | s-check(l, name, body, keyword-check) => import-flags
-    | s-check-test(l, op, refinement, left, right) => import-flags
+    | s-let(_, _, exp, _) => check-expr(import-flags, exp)
+
+    | s-var(l, name, value) => check-expr(import-flags, value)
+
+    | s-check(l, name, body, keyword-check) => check-expr(import-flags, body)
+
+    | s-check-test(l, op, refinement, left, right) => 
+      left-flags = check-expr(import-flags, left)
+      check-expr(left-flags, right)
 
     | s-table(l, headers, rows) =>
       import-flags.{ table-import: true }
@@ -309,6 +320,20 @@ fun check-expr(import-flags, expr :: A.Expr):
       ) => 
       # TODO(alex): check _check?
       check-expr(import-flags, body)
+
+    | s-hint-expr(_, _, exp) => check-expr(import-flags, exp)
+
+    | s-rec(l :: Loc, name :: Bind, value :: Expr) => check-expr(import-flags, value)
+
+    | s-contract(l :: Loc, name :: Name, params :: List<Name>, ann :: Ann) => import-flags
+
+    | s-check-expr(l :: Loc, exp :: Expr, ann :: Ann) => check-expr(import-flags, exp)
+
+    | s-prim-val(l :: Loc, name :: String) => import-flags
+
+    | s-id-var-modref(l :: Loc, id :: Name, uri :: String, name :: String) => import-flags
+
+    | s-undefined(l :: Loc) => import-flags
 
     | else => raise("NYI (builtin syntax detector): " + torepr(expr))
   end
