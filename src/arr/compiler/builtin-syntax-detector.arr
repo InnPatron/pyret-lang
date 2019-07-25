@@ -128,7 +128,12 @@ fun check-expr(import-flags, expr :: A.Expr):
       end
 
     | s-data-expr(l, name, namet, params, mixins, variants, shared, _check-loc, _check) =>
-      import-flags 
+      mixin-flags = check-list(import-flags, mixins)
+
+      cases(Option) _check:
+        | some(checks) => check-expr(mixin-flags, checks)
+        | none => mixin-flags
+      end 
       
     | s-dot(l, obj, field) =>
       check-expr(import-flags, obj)
