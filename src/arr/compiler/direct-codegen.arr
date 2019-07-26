@@ -10,7 +10,7 @@ import file("gensym.arr") as G
 import file("concat-lists.arr") as CL
 import file("type-structs.arr") as T
 import file("provide-serialization.arr") as PSE
-import file("builtin-syntax-detector.arr") as BSD
+import file("builtin-detector.arr") as BD
 import pathlib as P
 import sha as sha
 import string-dict as D
@@ -659,7 +659,7 @@ fun gen-tuple-bind(context, fields, as-name, value):
 end
 
 
-fun create-prelude(prog, provides, env, options, import-flags :: BSD.ImportFlags) block:
+fun create-prelude(prog, provides, env, options, import-flags :: BD.ImportFlags) block:
   runtime-builtin-relative-path = options.runtime-builtin-relative-path
   fun get-base-dir( source, build-dir ):
     source-head = ask:
@@ -840,7 +840,7 @@ fun compile-program(prog :: A.Program, uri, env, post-env, provides, options) bl
     post-env: post-env,
   }, prog.block)
 
-  import-flags = BSD.get-import-flags(prog)
+  import-flags = BD.get-import-flags(prog)
 
   prelude = create-prelude(prog, provides, env, options, import-flags)
 
