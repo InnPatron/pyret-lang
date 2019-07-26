@@ -350,6 +350,7 @@ fun get-import-flags(prog :: A.Program) -> ImportFlags:
   # Necessary due to how import flags are being updated in check-expr()
   # import-flags.{flag-to-flip} does not preserve ImportFlags type
   flags(
+    result.global-import,
     result.array-import,
     result.number-import,
     result.reactor-import,
