@@ -734,9 +734,6 @@ fun create-prelude(prog, provides, env, options, import-flags :: BD.ImportFlags)
     end
   end
 
-  global-names = AU.get-globals(prog)
-  uri-to-local-js-name = [D.mutable-string-dict:]
-
   fun import-builtin(bind-name :: A.Name, name :: String):
     J.j-var(bind-name, 
             j-app(j-id(const-id("require")), 
@@ -744,36 +741,44 @@ fun create-prelude(prog, provides, env, options, import-flags :: BD.ImportFlags)
                     j-str( relative-path + runtime-builtin-relative-path + name)]))
   end
 
-  global-import = import-builtin(GLOBAL, "global.arr.js")
+  # Creates stable compiler names for syntax with builtin dependencies
+  fun generate-manual-imports(shadow import-flags :: BD.ImportFlags):
+    global-import = import-builtin(GLOBAL, "global.arr.js")
+    nothing-import = J.j-var(NOTHING, j-undefined)
+    array-import = import-builtin(ARRAY, "array.arr.js")
+    table-import = import-builtin(TABLE, "tables.arr.js")
+    reactor-import = import-builtin(REACTOR,"reactors.arr.js")
 
-  nothing-import = J.j-var(NOTHING, j-undefined)
+    # Always emit global import
+    manual-imports = [clist: global-import, nothing-import]
 
-  array-import = import-builtin(ARRAY, "array.arr.js")
-  table-import = import-builtin(TABLE, "tables.arr.js")
-  reactor-import = import-builtin(REACTOR,"reactors.arr.js")
+    shadow manual-imports = if import-flags.table-import:
+      cl-append(manual-imports, cl-sing(table-import))
+    else:
+      manual-imports
+    end
+    shadow manual-imports = if import-flags.reactor-import:
+      # TODO(alex): Implement reactor.arr.js
+      # cl-append(manual-imports, cl-sing(reactor-import))
+      raise("reactor.arr.js NYI")
+    else:
+      manual-imports
+    end
+    shadow manual-imports = if import-flags.array-import:
+      # TODO(alex): Implement reactor.arr.js
+      # cl-append(manual-imports, cl-sing(reactor-import))
+      raise("array.arr.js NYI")
+    else:
+      manual-imports
+    end
 
-  # Always emit global import
-  manual-imports = [clist: global-import, nothing-import]
-
-  shadow manual-imports = if import-flags.table-import:
-    cl-append(manual-imports, cl-sing(table-import))
-  else:
     manual-imports
   end
-  shadow manual-imports = if import-flags.reactor-import:
-    # TODO(alex): Implement reactor.arr.js
-    # cl-append(manual-imports, cl-sing(reactor-import))
-    raise("reactor.arr.js NYI")
-  else:
-    manual-imports
-  end
-  shadow manual-imports = if import-flags.array-import:
-    # TODO(alex): Implement reactor.arr.js
-    # cl-append(manual-imports, cl-sing(reactor-import))
-    raise("array.arr.js NYI")
-  else:
-    manual-imports
-  end
+
+  global-names = AU.get-globals(prog)
+  uri-to-local-js-name = [D.mutable-string-dict:]
+
+  manual-imports = generate-manual-imports(import-flags)
 
   # We create a JS require() statement for each import in the Pyret program
   # and bind it to a unique name. dep-to-local-js-names helps us look
