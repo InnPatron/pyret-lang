@@ -204,9 +204,8 @@ fun get-dependencies(p :: PyretCode, uri :: URI) -> List<CS.Dependency>:
   deps = for map(s from lists.filter-map(get-import-type, parsed.imports)):
     AU.import-to-dep(s)
   end
-  new-deps = BD.apply-import-flags(parsed, deps)
-  spy: new-deps end
-  new-deps
+  # TODO(alex): Find a better place to scan the AST for builtin dependencies
+  BD.apply-import-flags(parsed, deps)
 end
 
 fun get-standard-dependencies(p :: PyretCode, uri :: URI) -> List<CS.Dependency>:
