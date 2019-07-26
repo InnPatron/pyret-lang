@@ -75,7 +75,7 @@ fun check-expr(import-flags, expr :: A.Expr):
 
       top-level-flags
 
-    | s-block(l, exprs) => check-seq(import-flags, exprs)
+    | s-block(l, exprs) => check-list(import-flags, exprs)
     | s-num(l, n) => 
       import-flags.{ number-import: true }
 
