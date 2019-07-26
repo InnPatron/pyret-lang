@@ -63,6 +63,7 @@ fun check-seq(import-flags, exprs):
   end
 end
 
+# Check an expression for imports to flag
 fun check-expr(import-flags, expr :: A.Expr):
   cases(A.Expr) expr block:
     | s-module(l, answer, dms, dvs, dts, checks) =>
@@ -342,9 +343,12 @@ fun check-expr(import-flags, expr :: A.Expr):
 
 end
 
-
+# Scans the AST for any syntax that uses builtin modules
 fun get-import-flags(prog :: A.Program) -> ImportFlags:
   result = check-expr(default-import-flags(), prog.block)
+
+  # Necessary due to how import flags are being updated in check-expr()
+  # import-flags.{flag-to-flip} does not preserve ImportFlags type
   flags(
     result.array-import,
     result.number-import,
@@ -352,6 +356,12 @@ fun get-import-flags(prog :: A.Program) -> ImportFlags:
     result.table-import)
 end
 
+
+# Scans the AST for any syntax that uses builtin modules
+# For any such syntax used, automatically add the necessary builtin modules as a dependency
+#   unless it is already listed as a dependency.
+# NOTE: This does NOT add any automatically imported modules into the prelude/namespace
+#   Specific names will NOT be accessible to user code without an explicit builtin module import
 fun apply-import-flags(prog :: A.Program, current-deps :: List<CS.Dependency>) -> List<CS.Dependency>:
   import-flags = get-import-flags(prog)
 
