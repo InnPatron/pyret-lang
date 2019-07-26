@@ -10,6 +10,7 @@ import file("gensym.arr") as G
 import file("concat-lists.arr") as CL
 import file("type-structs.arr") as T
 import file("provide-serialization.arr") as PSE
+import file("builtin-syntax-detector.arr") as BSD
 import pathlib as P
 import sha as sha
 import string-dict as D
@@ -100,16 +101,6 @@ fun make-fun-name(compiler, loc) -> String:
 end
 
 type Loc = SL.Srcloc
-
-default-import-flags = {
-  array-import: false,
-  number-import: false,
-  reactor-import: false,
-  table-import: false,
-}
-
-# Update by 'import-flags := import-flags.{ flags to change here }'
-var import-flags = default-import-flags
 
 js-names = A.MakeName(0)
 js-ids = D.make-mutable-string-dict()
@@ -668,7 +659,7 @@ fun gen-tuple-bind(context, fields, as-name, value):
 end
 
 
-fun create-prelude(prog, provides, env, options, shadow import-flags) block:
+fun create-prelude(prog, provides, env, options, import-flags :: BSD.ImportFlags) block:
   runtime-builtin-relative-path = options.runtime-builtin-relative-path
   fun get-base-dir( source, build-dir ):
     source-head = ask:
@@ -831,9 +822,6 @@ fun create-prelude(prog, provides, env, options, shadow import-flags) block:
 end
 
 fun compile-program(prog :: A.Program, uri, env, post-env, provides, options) block:
-  # Reset import flags between compile-program calls
-  import-flags := default-import-flags
-
   # TODO(alex): Find out if a uri is actually required by AU.data-expr-to-datatype
 
   # Translate datatypes from Expr form to Type form in order to be useful for cases expressions
@@ -851,6 +839,8 @@ fun compile-program(prog :: A.Program, uri, env, post-env, provides, options) bl
     env: env,
     post-env: post-env,
   }, prog.block)
+
+  import-flags = BSD.get-import-flags(prog)
 
   prelude = create-prelude(prog, provides, env, options, import-flags)
 
