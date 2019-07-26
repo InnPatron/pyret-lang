@@ -16,6 +16,7 @@ type Ann = A.Ann
 
 data ImportFlags:
   | flags(
+          global-import :: Boolean,
           array-import :: Boolean,
           number-import :: Boolean,
           reactor-import :: Boolean,
@@ -23,11 +24,12 @@ data ImportFlags:
 end
 
 fun default-import-flags() -> ImportFlags:
-  flags(false, false, false, false)
+  flags(true, false, false, false, false)
 end
 
 fun fuse-flags(lhs, rhs) -> ImportFlags:
   flags(
+    lhs.global-import or rhs.global-import,
     lhs.array-import or rhs.array-import,
     lhs.number-import or rhs.number-import,
     lhs.reactor-import or rhs.reactor-import,
@@ -354,12 +356,18 @@ fun apply-import-flags(prog :: A.Program, current-deps :: List<CS.Dependency>) -
   import-flags = get-import-flags(prog)
 
   new-deps = current-deps
-  
+ 
+  global-dep = CS.builtin("global") 
   table-dep = CS.builtin("tables")
   reactor-dep = CS.builtin("reactors")
   number-dep = CS.builtin("number")
   array-dep = CS.builtin("array")
 
+  shadow new-deps = if import-flags.global-import and not(new-deps.member(global-dep)):
+    new-deps.append([list: global-dep])
+  else:
+    new-deps
+  end
 
   shadow new-deps = if import-flags.table-import and not(new-deps.member(table-dep)):
     new-deps.append([list: table-dep])
