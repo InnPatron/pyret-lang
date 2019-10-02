@@ -79,23 +79,48 @@ export const makeRequireAsync = (
       runner.path = nextPath;
       currentRunner = runner;
 
+      let kontinueStorage: any = null;
       resolve({
-        run: (callback: (result: any) => void): void => runner.run((result: any) => {
-          // TODO(Alex): fix stopify bug where evaled result is not passed to AbstractRunner.onDone callback
-          cwd = oldWd;
-          if(result.type !== "normal") {
-            throw new Error(result);
-          }
-          const toReturn = runner.g.module.exports;
-          cache[cachePath] = toReturn;
+        run: () => { 
+          new Promise((resolve, reject) => {
+            // TODO(Alex): fix stopify bug where evaled result is not passed to AbstractRunner.onDone callback
+            runner.run((result: any) => {
+              cwd = oldWd;
+              if(result.type !== "normal") {
+                // Clear any stored continues
+                kontinueStorage = null;
+                reject(result);
+              }
+              const toReturn = runner.g.module.exports;
+              cache[cachePath] = toReturn;
 
-          callback(toReturn);
-        }),
-        pause: (callback: (line: number) => void): void => {
-          runner.pause(callback);
+              resolve(toReturn);
+            });
+          })
+        },
+        pause: (): void => {
+          runner.pauseK((kontinue: (runSignal: any) => void) => {
+            kontinueStorage = kontinue;
+          });
+        },
+        stop: (): void => {
+          // Clear any stored continues
+          kontinueStorage = null;
+
+          runner.pauseK((kontinue: (runSignal: any) => void) => {
+            kontinue({
+              "type": "error",
+              "error": "PAUSE",
+            });
+          });
         },
         resume: (): void => {
-          runner.resume();
+          if (kontinueStorage !== null) {
+            kontinueStorage({
+              "type": "normal",
+              "value": undefined,
+            });
+          }
         },
       });
     });

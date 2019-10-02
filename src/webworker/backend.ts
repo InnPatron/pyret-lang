@@ -134,19 +134,27 @@ export const runProgram2 = (
         resolve({
           run: (callback: (result: RunResult) => void): void => {
             const startRun = window.performance.now();
-            asyncRunner.run((result: any) => {
-              const endRun = window.performance.now();
-              console.log("run time", endRun - startRun);
-              callback({
-                time: endRun - startRequire,
-                result: result,
+            asyncRunner.run()
+              .then((result: any) => {
+                const endRun = window.performance.now();
+                console.log("run time", endRun - startRun);
+                callback({
+                  time: endRun - startRequire,
+                  result: result,
+                });
               });
-            });
           },
-          pause: (callback: (line: number) => void): void => {
-            asyncRunner.pause(callback);
+          stop: (callback: () => void): void => {
+            asyncRunner.stop();
+            callback();
+          },
+          pause: (callback: () => void): void => {
+            // TODO: Add pause callback?
+            asyncRunner.pause();
+            callback();
           },
           resume: (): void => {
+            // TODO: Add resume callback?
             asyncRunner.resume();
           },
         });
