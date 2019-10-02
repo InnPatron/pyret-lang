@@ -580,7 +580,7 @@ class Editor extends React.Component<EditorProps, EditorState> {
 
     stop = () => {
         if (this.state.currentRunner !== undefined) {
-            this.state.currentRunner.pause((line: number) => console.log("paused on line", line))
+            this.state.currentRunner.pause(() => console.log("paused"))
             this.setState({
                 currentRunner: undefined,
                 compileState: CompileState.Stopped
