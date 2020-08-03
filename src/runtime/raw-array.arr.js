@@ -4,23 +4,23 @@ module.exports = {
       return arr;
     }
   },
-  'get': function( arr, index ) {
+  'raw-array-get': function( arr, index ) {
     return arr[index];
   },
-  'push': function( arr, elm ) {
+  'raw-array-push': function( arr, elm ) {
     arr.push( elm );
     return arr;
   },
-  'fold': function( fun, val, arr ) {
+  'raw-array-fold': function( fun, val, arr ) {
     return arr.reduce( fun, val );
   },
-  'sum': function( arr ) {
+  'raw-array-sum': function( arr ) {
     return arr.reduce( function( x, y ) { return x + y; }, 0 );
   },
-  'min': function( arr ) {
+  'raw-array-min': function( arr ) {
     return arr.reduce( function( x, y ) { return Math.min( x, y ); }, arr[0] );
   },
-  'max': function( arr ) {
+  'raw-array-max': function( arr ) {
     return arr.reduce( function( x, y ) { return Math.max( x, y ); }, arr[0] );
   }
 }
