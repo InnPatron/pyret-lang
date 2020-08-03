@@ -29,5 +29,12 @@ module.exports = {
   },
   'raw-array-max': function( arr ) {
     return arr.reduce( function( x, y ) { return Math.max( x, y ); }, arr[0] );
-  }
+  },
+  'raw-array-of': function(elem, n) {
+    if (n <= 0) {
+      throw "raw-array-of: <0 repititions";
+    }
+
+    return new Array(n).fill(elem);
+  },
 }
