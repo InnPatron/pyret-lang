@@ -14,6 +14,9 @@ module.exports = {
   'raw-array-fold': function( fun, val, arr ) {
     return arr.reduce( fun, val );
   },
+  'raw-array-foldr': function( fun, val, arr ) {
+    return arr.reduceRight( fun, val );
+  },
   'raw-array-sum': function( arr ) {
     return arr.reduce( function( x, y ) { return x + y; }, 0 );
   },
