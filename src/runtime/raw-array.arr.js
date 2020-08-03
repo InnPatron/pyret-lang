@@ -4,15 +4,8 @@ module.exports = {
       return arr;
     }
   },
-  'at': function( arr, index ) {
+  'get': function( arr, index ) {
     return arr[index];
-  },
-  'get': function( list, index ) {
-    var arr = [];
-    for (i = 0; i < list.length; i++) {
-      arr.push(list[i][index]);
-    }
-    return arr;
   },
   'push': function( arr, elm ) {
     arr.push( elm );
