@@ -4,6 +4,10 @@ module.exports = {
       return arr;
     }
   },
+  'raw-array-set': function( arr, index, value ) {
+    arr[index] = value;
+    return arr;
+  },
   'raw-array-get': function( arr, index ) {
     return arr[index];
   },
