@@ -37,4 +37,12 @@ module.exports = {
 
     return new Array(n).fill(elem);
   },
+  'raw-array-build': function(f, n) {
+    let array = new Array(n);
+    for (let i = 0; i < n; i++) {
+      array[i] = f(i);
+    }
+
+    return array;
+  }
 }
