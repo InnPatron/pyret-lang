@@ -19,3 +19,19 @@ module.exports["is-Unknown"] = EQUALITY_CORE.isUnknown;
 module.exports["to-boolean"] = EQUALITY_CORE.to_boolean;
 module.exports["equal-or"] = EQUALITY_CORE.equal_or;
 module.exports["equal-and"] = EQUALITY_CORE.equal_and;
+
+module.exports["within"] = EQUALITY.withinRel;
+module.exports["within-rel"] = EQUALITY.withinRel;
+module.exports["within-abs"] = EQUALITY.withinAbs;
+module.exports["within-rel-now"] = EQUALITY.withinRelNow;
+module.exports["within-abs-now"] = EQUALITY.withinAbsNow;
+
+module.exports["equal-now"] = EQUALITY.equalNow;
+module.exports["equal-now3"] = EQUALITY.equalNow3;
+
+module.exports["identical"] = EQUALITY.identical;
+module.exports["identical3"] = EQUALITY.identical3;
+
+module.exports["equal-always"] = EQUALITY.equalAlways;
+module.exports["equal-always3"] = EQUALITY.equalAlways3;
+
