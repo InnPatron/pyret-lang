@@ -11,4 +11,4 @@ bar :: (Number -> Number) = foo(10, _)
 
 # 10 + 10 + 10 + (-30) + 10 + 100 = 110
 result = bar(10) + bar(-30) + bar(100)
-G.print(result)
+G.console-log(result)
