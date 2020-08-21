@@ -37,6 +37,11 @@ var repl :: Option<R.ChunkyRepl> = none
 
 compile-handler = lam(msg, send-message) block:
   spy: msg end
+  # TODO(alex): Need to simplify compile request option parsing
+  #   Ideally, parse-request loads extra flags into a regular string-dict and passes to populate-options
+  #   Goal: reduce the message parser's awareness of compiler options
+  #     Awareness causes needless code duplication converting options -> Requst compile-program fields -> string dictionary
+  #   Maybe needs to happen to other fields on Request compile-program
   cases(O.Option) M.parse-request(msg):
     | none =>
       nothing
