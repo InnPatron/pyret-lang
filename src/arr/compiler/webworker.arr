@@ -80,7 +80,7 @@ compile-handler = lam(msg, send-message) block:
           with-logger = opts.set("log", log)
           with-error = with-logger.set("log-error", err)
           # compile-opts = CO.populate-options(with-error, pyret-dir)
-          
+
           cases(E.Either) run-task(lam(): compile(with-error, pyret-dir) end):
             | right(exn) =>
               err-str = RED.display-to-string(exn-unwrap(exn).render-reason(), tostring, empty)
@@ -148,7 +148,7 @@ compile-handler = lam(msg, send-message) block:
             end
             find-module
           end
-          
+
           #modules = get-builtin-modules()
           modules = [SD.mutable-string-dict: ]
           compile-context = "anchor-context-currently-unused"
