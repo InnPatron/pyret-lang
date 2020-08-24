@@ -166,6 +166,7 @@ end
 # Import this module, and bind the given value and type bindings from it
 data ExtraImport:
   | extra-import(dependency :: Dependency, as-name :: String, values :: List<String>, types :: List<String>)
+  | prewritten-import(prewritten-import :: A.Import)
 end
 
 data Loadable:

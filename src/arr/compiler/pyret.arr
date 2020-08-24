@@ -93,7 +93,9 @@ fun main(args :: List<String>) -> Number block:
     "runtime-builtin-relative-path",
       C.next-val(C.Str, C.once, "Relative path of builtins at runtime. Only used when compiling builtins using anchor."),
       "compile-mode",
-      C.next-val-default(C.Str, DEFAULT-COMPILE_MODE, none, C.once, "Compilation mode (defaults to \"normal\")")
+      C.next-val-default(C.Str, DEFAULT-COMPILE_MODE, none, C.once, "Compilation mode (defaults to \"normal\")"),
+      "extra-imports",
+      C.next-val(C.Str, C.once, "Path to extra imports .arr file")
   ]
 
   params-parsed = C.parse-args(options, args)
