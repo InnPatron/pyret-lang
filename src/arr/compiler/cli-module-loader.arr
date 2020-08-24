@@ -553,7 +553,28 @@ fun build-program(path, options, stats) block:
     options: options
   }, base-module)
   clear-and-print("Compiling worklist...")
-  wl = CL.compile-worklist(module-finder, base.locator, base.context)
+
+  # TODO(alex): override locator dependencies in a nicer way
+  #   The current way only overrides for the ROOT module
+  #   To override, the extra dependencies must somehow be passed to
+  #     compile-worklist()
+  custom-locator = base.locator.{
+      method get-dependencies(self):
+        fun my-filter(xi):
+          cases(CS.ExtraImport) xi:
+            | extra-import(_, _, _, _) => none
+            | prewritten-import(prewritten-import) => CL.get-import-type(prewritten-import)
+          end
+        end
+        converted = for map(s from lists.filter-map(my-filter, custom-extra-imports.imports)):
+          _ = print(s)
+          _ = print("\n\n")
+          AU.import-to-dep(s)
+        end
+        base.locator.get-dependencies() + converted
+      end
+  }
+  wl = CL.compile-worklist(module-finder, custom-locator, base.context)
 
   max-dep-times = CL.dep-times-from-worklist(wl)
 
@@ -563,14 +584,6 @@ fun build-program(path, options, stats) block:
     if string-contains(tmp.locator.uri(), "file"):
       tmp.{
         locator: tmp.locator.{
-          method get-dependencies(self):
-            converted = for map(s from lists.filter-map(CL.get-import-type, self.custom-extra-imports())):
-              _ = print(s)
-              _ = print("\n\n")
-              AU.import-to-dep(s)
-            end
-            tmp.locator.get-dependencies() + converted
-          end,
           method get-extra-imports(self):
             _ = print("HAHHA\n\n\n\n\n")
             CS.extra-imports(
