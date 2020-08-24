@@ -907,8 +907,6 @@ fun make-renamer(replacements :: SD.StringDict):
   }
 end
 
-
-
 fun wrap-extra-imports(p :: A.Program, env :: CS.ExtraImports) -> A.Program:
   expr = p.block
 
@@ -929,23 +927,37 @@ fun wrap-extra-imports(p :: A.Program, env :: CS.ExtraImports) -> A.Program:
       |#
       l = A.dummy-loc
       full-imports = for fold(lst from empty, i from imports):
-          name-to-use = if i.as-name == "_": A.global-names.make-atom("$extra-import") else: A.s-name(l, i.as-name) end
-          ast-dep = cases(CS.Dependency) i.dependency:
-            | builtin(name) => A.s-const-import(p.l, name)
-            | dependency(protocol, args) => A.s-special-import(p.l, protocol, args)
-          end
-          import-line = A.s-import(p.l, ast-dep, name-to-use)
-          include-line =
-            A.s-include-from(p.l, [list: name-to-use],
-              i.values.map(lam(v):
-                A.s-include-name(l, A.s-module-ref(l, [list: A.s-name(l, v)], none))
-              end) +
-              i.types.map(lam(t):
-                A.s-include-type(l, A.s-module-ref(l, [list: A.s-name(l, t)], none))
-              end))
-          link(import-line, link(include-line, empty)) + lst
-        end + p.imports
+        cases(CS.ExtraImport) i:
+          | extra-import(_, _, _, _) =>
+            name-to-use = if i.as-name == "_": A.global-names.make-atom("$extra-import") else: A.s-name(l, i.as-name) end
+            ast-dep = cases(CS.Dependency) i.dependency:
+              | builtin(name) => A.s-const-import(p.l, name)
+              | dependency(protocol, args) => A.s-special-import(p.l, protocol, args)
+            end
+            import-line = A.s-import(p.l, ast-dep, name-to-use)
+            include-line =
+              A.s-include-from(p.l, [list: name-to-use],
+                i.values.map(lam(v):
+                  A.s-include-name(l, A.s-module-ref(l, [list: A.s-name(l, v)], none))
+                end) +
+                i.types.map(lam(t):
+                  A.s-include-type(l, A.s-module-ref(l, [list: A.s-name(l, t)], none))
+                end))
+            link(import-line, link(include-line, empty)) + lst
+          | prewritten-import(prewritten) => link(replace-import-loc(prewritten, p.l), lst)
+        end
+      end + p.imports
       A.s-program(p.l, p._provide, p.provided-types, p.provides, full-imports, p.block)
+  end
+end
+
+fun replace-import-loc(imp, new-loc):
+  cases(A.Import) imp:
+    | s-include(_, mod) => A.s-include(new-loc, mod)
+    | s-include-from(_, mod, specs) => A.s-include-from(new-loc, mod, specs)
+    | s-import(_, file, name) => A.s-import(new-loc, file, name)
+    | s-import-types(_, file, name, types) => A.s-import-types(new-loc, file, name, types)
+    | s-import-fields(_, fields, file) => A.s-import-fields(new-loc, fields, file)
   end
 end
 

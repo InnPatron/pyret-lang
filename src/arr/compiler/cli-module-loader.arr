@@ -159,6 +159,8 @@ fun get-cached(basedir, uri, name, cache-type):
     method name(_): name end,
 
     method set-compiled(_, _, _): nothing end,
+    # TODO(alex): If a module is cached, assume that the extra imports were already
+    #  attached to it?
     method get-compiled(self, options):
       provs = CS.provides-from-raw-provides(self.uri(), {
           uri: self.uri(),
@@ -541,6 +543,8 @@ fun build-program(path, options, stats) block:
     str := new-str
   end
   print-progress(str)
+  custom-extra-imports = get-extra-imports(options)
+
   base-module = CS.dependency("file", [list: path])
   base = module-finder({
     current-load-path: P.resolve(options.base-dir),
@@ -554,7 +558,33 @@ fun build-program(path, options, stats) block:
   max-dep-times = CL.dep-times-from-worklist(wl)
 
   shadow wl = for map(located from wl):
-    located.{ locator: get-cached-if-available-known-mtimes(options.compiled-cache, located.locator, max-dep-times) }
+    tmp = located.{ locator: get-cached-if-available-known-mtimes(options.compiled-cache, located.locator, max-dep-times) }
+    # TODO(alex): override locators in a nicer way
+    if string-contains(tmp.locator.uri(), "file"):
+      tmp.{
+        locator: tmp.locator.{
+          method get-dependencies(self):
+            converted = for map(s from lists.filter-map(CL.get-import-type, self.custom-extra-imports())):
+              _ = print(s)
+              _ = print("\n\n")
+              AU.import-to-dep(s)
+            end
+            tmp.locator.get-dependencies() + converted
+          end,
+          method get-extra-imports(self):
+            _ = print("HAHHA\n\n\n\n\n")
+            CS.extra-imports(
+              tmp.locator.get-extra-imports().imports + custom-extra-imports.imports
+            )
+          end,
+          method custom-extra-imports(self):
+            custom-extra-imports.imports
+          end
+        }
+      }
+    else:
+      tmp
+    end
   end
   copy-js-dependencies( wl, options )
   clear-and-print("Loading existing compiled modules...")
@@ -642,4 +672,33 @@ fun lint(program :: String, uri :: String):
         | err(errs) => E.left(errs)
       end
   end
+end
+
+fun get-extra-imports(options) -> CS.ExtraImports:
+  extra-import-list = cases(Option) options.extra-imports:
+    | some(ep) =>
+      extra-import-file = CS.dependency("file", [list: ep])
+      extra-import-located = module-finder({
+        current-load-path: P.resolve(options.base-dir),
+        cache-base-dir: options.compiled-cache,
+        compiled-read-only-dirs: options.compiled-read-only.map(P.resolve),
+        options: options
+      }, extra-import-file)
+      extra-import-locator = extra-import-located.locator
+      ast = cases(CL.PyretCode) extra-import-locator.get-module():
+        # TODO(alex): is this check necessary?
+        | pyret-string(str) => PP.surface-parse(str, extra-import-locator.uri())
+        | pyret-ast(ast) => ast
+      end
+      # NOTE(alex): URIs will point towards the original file stil
+      #   Replaced in AU.wrap-extra-imports()
+      ast.imports.foldl(lam(imp, acc):
+        _ = print(imp)
+        _ = print("\n\n")
+        link(CS.prewritten-import(imp), acc)
+      end, empty)
+    | none => empty
+  end
+
+  CS.extra-imports(extra-import-list)
 end
