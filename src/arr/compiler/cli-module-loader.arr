@@ -703,8 +703,8 @@ fun get-extra-imports(options) -> CS.ExtraImports:
       # NOTE(alex): URIs will point towards the original file stil
       #   Replaced in AU.wrap-extra-imports()
       ast.imports.foldl(lam(imp, acc):
-        _ = print(imp)
-        _ = print("\n\n")
+        # _ = print(imp)
+        # _ = print("\n\n")
         link(CS.prewritten-import(imp), acc)
       end, empty)
     | none => empty
