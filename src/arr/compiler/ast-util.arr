@@ -944,7 +944,9 @@ fun wrap-extra-imports(p :: A.Program, env :: CS.ExtraImports) -> A.Program:
                   A.s-include-type(l, A.s-module-ref(l, [list: A.s-name(l, t)], none))
                 end))
             link(import-line, link(include-line, empty)) + lst
-          | prewritten-import(prewritten) => link(replace-import-loc(prewritten, p.l), lst)
+
+          | prewritten-import(prewritten) => link(prewritten, lst)
+          # | prewritten-import(prewritten) => link(replace-import-loc(prewritten, p.l), lst)
         end
       end + p.imports
       A.s-program(p.l, p._provide, p.provided-types, p.provides, full-imports, p.block)
