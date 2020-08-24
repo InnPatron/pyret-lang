@@ -66,8 +66,9 @@ compile-handler = lam(msg, send-message) block:
             builtin-js-dir,
             checks,
             type-check,
-            recompile-builtins) =>
-          opts = request.get-options()
+            recompile-builtins,
+            raw-options) =>
+          opts = raw-options
           spy: opts end
           fun log(s, to-clear):
             clear-first = cases(Option) to-clear:

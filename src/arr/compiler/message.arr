@@ -23,7 +23,8 @@ data Request:
       builtin-js-dir :: String,
       checks :: String,
       type-check :: Boolean,
-      recompile-builtins :: Boolean)
+      recompile-builtins :: Boolean,
+      raw-options :: SD.StringDict<Any>)
   | create-repl
   | compile-interaction(
       program :: String)
@@ -173,7 +174,8 @@ fun parse-compile-dict(dict :: SD.StringDict<Any>) -> O.Option<Request % (is-com
                               builtin-js-dir,
                               checks,
                               type-check,
-                              recompile-builtins))
+                              recompile-builtins,
+                              dict))
                         end)
                     end)
                 end)
