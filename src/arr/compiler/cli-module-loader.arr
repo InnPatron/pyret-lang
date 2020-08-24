@@ -567,8 +567,6 @@ fun build-program(path, options, stats) block:
           end
         end
         converted = for map(s from lists.filter-map(my-filter, custom-extra-imports.imports)):
-          _ = print(s)
-          _ = print("\n\n")
           AU.import-to-dep(s)
         end
         base.locator.get-dependencies() + converted
@@ -585,7 +583,6 @@ fun build-program(path, options, stats) block:
       tmp.{
         locator: tmp.locator.{
           method get-extra-imports(self):
-            _ = print("HAHHA\n\n\n\n\n")
             CS.extra-imports(
               tmp.locator.get-extra-imports().imports + custom-extra-imports.imports
             )

@@ -244,11 +244,11 @@ fun compile-worklist-known-modules<a>(dfind :: (a, CS.Dependency -> Located<a>),
         temp-marked.set-now(locator.uri(), true)
         pmap = SD.make-mutable-string-dict()
         deps = locator.get-dependencies()
-        _ = print("\n\nDeps[")
-        _ = print(locator.uri())
-        _ = print("]:\n")
-        _ = print(deps)
-        _ = print("\n\n")
+        # _ = print("\n\nDeps[")
+        # _ = print(locator.uri())
+        # _ = print("]:\n")
+        # _ = print(deps)
+        # _ = print("\n\n")
         found-mods = for lists.filter-map(d from deps) block:
           cases(CS.Dependency) d block:
             | dependency(_, _) =>
@@ -322,11 +322,11 @@ fun compile-program-with(worklist :: List<ToCompile>, modules, options) -> Compi
     uri = w.locator.uri()
     if not(cache.has-key-now(uri)) block:
       provide-map = w.dependency-map.freeze()
-      _ = print("\n\nProvide map[")
-      _ = print(uri)
-      _ = print("]\n")
-      _ = print(provide-map)
-      _ = print("\n\n")
+      # _ = print("\n\nProvide map[")
+      # _ = print(uri)
+      # _ = print("]\n")
+      # _ = print(provide-map)
+      # _ = print("\n\n")
       options.before-compile(w.locator)
       {loadable :: Loadable; trace :: List} = compile-module(w.locator, provide-map, cache, options)
       # I feel like here we want to generate two copies of the loadable:
