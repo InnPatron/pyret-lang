@@ -3057,7 +3057,7 @@ runtime-provides = provides("builtin://global",
   [string-dict:])
 
 runtime-values = for SD.fold-keys(rb from [string-dict:], k from runtime-provides.values):
-  rb.set(k, bind-origin(SL.builtin("global"), SL.builtin("global"), true, "builtin://global", A.s-name(A.dummy-loc, k)))
+  rb.set(k, bind-origin(SL.builtin("runtime-facade"), SL.builtin("runtime-facade"), true, "builtin://runtime-facade", A.s-name(A.dummy-loc, k)))
 end
 
 shadow runtime-types = [string-dict:
