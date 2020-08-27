@@ -27,6 +27,10 @@
     {
         "import-type": "builtin",
         "name": "any"
+    },
+    {
+        "import-type": "builtin",
+        "name": "runtime-facade"
     }
   ],
   "provides": {

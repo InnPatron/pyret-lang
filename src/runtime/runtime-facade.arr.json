@@ -1,0 +1,73 @@
+{
+  "requires": [
+    {
+        "import-type": "builtin",
+        "name": "number"
+    },
+    {
+        "import-type": "builtin",
+        "name": "boolean"
+    },
+    {
+        "import-type": "builtin",
+        "name": "nothing"
+    },
+    {
+        "import-type": "builtin",
+        "name": "raw-array"
+    },
+    {
+        "import-type": "builtin",
+        "name": "string"
+    },
+    {
+        "import-type": "builtin",
+        "name": "any"
+    }
+  ],
+  "provides": {
+
+    "shorthands": {
+      "tva": ["tid", "a"]
+    },
+    "values": {
+      "_plus":   {"bind": "fun",
+                  "flatness": false,
+                  "name": "_plus",
+                  "typ": ["arrow", ["tany", "tany"], "tany"]},
+      "_minus":  {"bind": "fun",
+                  "flatness": false,
+                  "name": "_minus",
+                  "typ": ["arrow", ["tany", "tany"], "tany"]},
+      "_times":  {"bind": "fun",
+                  "flatness": false,
+                  "name": "_times",
+                  "typ": ["arrow", ["tany", "tany"], "tany"]},
+      "_divide": {"bind": "fun",
+                  "flatness": false,
+                  "name": "_divide",
+                  "typ": ["arrow", ["tany", "tany"], "tany"]},
+      "_lessthan": {"bind": "fun",
+                  "flatness": false,
+                  "name": "_lessthan",
+                  "typ": ["arrow", ["tany", "tany"], "Boolean"]},
+      "_lessequal": {"bind": "fun",
+                  "flatness": false,
+                  "name": "_lessequal",
+                  "typ": ["arrow", ["tany", "tany"], "Boolean"]},
+      "_greaterthan": {"bind": "fun",
+                  "flatness": false,
+                  "name": "_greaterthan",
+                  "typ": ["arrow", ["tany", "tany"], "Boolean"]},
+      "_greaterequal": {"bind": "fun",
+                  "flatness": false,
+                  "name": "_greaterequal",
+                  "typ": ["arrow", ["tany", "tany"], "Boolean"]},
+
+      "nothing": "Nothing",
+      "print": ["forall", "a", ["arrow", ["tva"], "tva"]]
+    },
+    "aliases": { },
+    "datatypes": { }
+  }
+}
