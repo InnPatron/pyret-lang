@@ -1,7 +1,7 @@
 provide *
 provide-types *
 
-import global as _
+import runtime-facade as _
 
 data Color:
   | color(
