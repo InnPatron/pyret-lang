@@ -108,7 +108,7 @@ data List<a>:
       doc: ```Returns a new list whose contents are the same as those in this list,
             sorted by the default ordering and equality```
       # TODO(alex): Attempting to remove "G." results in a type error
-      self.sort-by(lam(e1,e2): G._lessthan(e1, e2) end, equality.within(~0))
+      self.sort-by(lam(e1,e2): equality._lessthan(e1, e2) end, equality.within(~0))
     end,
 sharing:
   # Note(alex): Many methods are implemented as "sharing" b/c "with" methods cannot see other "with" methods

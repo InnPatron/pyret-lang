@@ -6,7 +6,7 @@
 provide *
 provide-types *
 
-import global as _
+import runtime-facade as _
 
 data Option<a>:
   | some(value :: a)
