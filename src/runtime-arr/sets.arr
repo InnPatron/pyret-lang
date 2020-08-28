@@ -38,7 +38,6 @@ end
 include from G:
   not,
   raise,
-  _lessthan
 end
 
 # SETS
@@ -50,8 +49,9 @@ end
 #
 #   _lessthan :: (Any, Any -> Boolean)
 #
-# TODO(alex): Now that we rely on the the "_lessthan" function, can we parameterize
-#   Sets? Otherwise, all type annotations will need to be in terms of Any
+# NOTE: _lessthan is seen as a global from runtime-facade (which desugars into "<" to the typechecker)
+#    Need to remove _lessthan and co from runtime-values or update the typechecker
+#      to avoid shadowing issues
 #
 data AVLTree<a>:
   | leaf
@@ -72,7 +72,7 @@ sharing:
       | branch(value, _, left, right) =>
         if (val == value):
           true
-        else if _lessthan(val, value):
+        else if G._lessthan(val, value):
           left.contains(val)
         else:
           right.contains(val)
@@ -86,7 +86,7 @@ sharing:
       | branch(value, _, left, right) =>
         if val == value:
           mkbranch(val, left, right)
-        else if _lessthan(val, value):
+        else if G._lessthan(val, value):
           rebalance(mkbranch(value, left.insert(val), right))
         else:
           rebalance(mkbranch(value, left, right.insert(val)))
@@ -100,7 +100,7 @@ sharing:
       | branch(value, _, left, right) =>
         if val == value:
           remove-root(self)
-        else if _lessthan(val, value):
+        else if G._lessthan(val, value):
           rebalance(mkbranch(value, left.remove(val), right))
         else:
           rebalance(mkbranch(value, left, right.remove(val)))
